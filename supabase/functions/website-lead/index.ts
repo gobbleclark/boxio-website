@@ -16,7 +16,7 @@ const MAX_PER_IP_PER_10_MIN = 5;
 
 // CRM settings
 const LEAD_OWNER_ID = "631120de-69a5-463a-9ec0-0248a16f09dc"; // app_users: Justin Procopio (sales)
-const PIPELINE_NAME = "Sales Pipeline"; // quote deals go into this pipeline's first open stage (prefers the HubSpot-imported one)
+const PIPELINE_NAME = "Website Leads"; // website deals go into this pipeline's first open stage
 const FREE_EMAIL_DOMAINS = new Set([
   "gmail.com", "googlemail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", "msn.com", "icloud.com",
   "me.com", "mac.com", "aol.com", "proton.me", "protonmail.com", "ymail.com", "comcast.net", "att.net", "gmx.com",
@@ -116,9 +116,9 @@ async function syncToCrm(lead: Lead) {
       contactId = created.id;
     }
 
-    // Deal: every free-quote request opens a deal in the Sales Pipeline's first open stage
+    // Deal: free-quote requests and new-partnership inquiries open a deal in the Website Leads pipeline
     let dealId: string | null = null;
-    if (isQuote) {
+    if (isProspect) {
       const [stage] = await tx`
         select s.id as stage_id, p.id as pipeline_id
         from public.crm_pipelines p join public.crm_stages s on s.pipeline_id = p.id
@@ -126,12 +126,12 @@ async function syncToCrm(lead: Lead) {
           and not coalesce(s.archived, false) and s.outcome = 'open'
         order by (p.hubspot_id is not null) desc, s.sort_order nulls last limit 1`;
       if (stage) {
-        const summary = ["Monthly orders", "Preferred warehouse", "Sales channels", "Services", "SKUs", "Product type"]
+        const summary = ["Monthly orders", "Preferred warehouse", "Sales channels", "Services", "SKUs", "Product type", "Location", "Message"]
           .filter((k) => lead.details[k]).map((k) => `${k}: ${lead.details[k]}`).join("\n");
         const [deal] = await tx`
           insert into public.crm_deals
             (id, name, pipeline_id, stage_id, deal_type, description, company_id, owner_id, owner_name, created_at, updated_at)
-          values (gen_random_uuid(), ${(lead.company ?? lead.name) + " — Website quote"}, ${stage.pipeline_id}, ${stage.stage_id},
+          values (gen_random_uuid(), ${(lead.company ?? lead.name) + (isQuote ? " — Website quote" : " — Website inquiry")}, ${stage.pipeline_id}, ${stage.stage_id},
                   'newbusiness', ${summary || null}, ${companyId}, ${LEAD_OWNER_ID}, 'Justin Procopio', ${now}, ${now})
           returning id`;
         dealId = deal.id;
