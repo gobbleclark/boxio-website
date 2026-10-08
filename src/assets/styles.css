@@ -524,3 +524,43 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 28px; }
 .calendly-box { background: #fff; border-radius: 14px; overflow: hidden; min-height: 600px; margin-top: 18px; }
 .calendly-box .calendly-inline-widget { min-width: 300px; height: 600px; }
 .calendly-loading { color: var(--muted); text-align: center; padding: 120px 20px; margin: 0; }
+
+/* ---------- Mobile hardening ---------- */
+/* Grid/flex children default to min-width:auto, which lets wide content (big stat numbers) stretch the page */
+.grid > *, .split > *, .hero-grid > *, .form-shell > *, .map-wrap > *, .steps > *, .foot-grid > * { min-width: 0; }
+.big-stats .card strong { font-size: clamp(1.9rem, 7.5vw, 2.6rem); }
+@media (max-width: 520px) {
+  .big-stats { gap: 12px; }
+  .big-stats .card { padding: 20px 16px; }
+  .stat strong { font-size: 1.7rem; }
+  .hero-actions .btn { flex: 1 1 auto; }
+  .cta-band .btns .btn { flex: 1 1 100%; }
+  .step-stage { padding: 28px 20px; min-height: 0; }
+  .form-card .choice-grid { grid-template-columns: 1fr 1fr; }
+  section { padding: 64px 0; }
+}
+/* Comfortable tap targets for footer and sidebar links on touch screens */
+@media (max-width: 900px) {
+  .site-footer ul { gap: 2px; }
+  .site-footer li a, .site-footer p a, .site-footer address a { display: inline-block; padding: 10px 0; }
+  .aside-card .contact-line a { display: inline-block; padding: 8px 0; }
+}
+/* Calendly: let it shrink on small phones instead of forcing 300px */
+@media (max-width: 520px) {
+  .aside-card.booking { padding: 24px 10px 10px; }
+  .calendly-box .calendly-inline-widget { min-width: 0; width: 100%; }
+}
+fieldset { min-width: 0; }
+.choice span { overflow-wrap: normal; }
+@media (max-width: 520px) { .form-card .choice span { padding: 12px; font-size: .95rem; } .form-card .choice-grid { gap: 8px; } }
+@media (max-width: 900px) {
+  .logo { padding: 6px 0; }
+  .foot-bottom a, address a, .loc-card address a { display: inline-block; padding: 10px 0; }
+  .foot-bottom { line-height: 1.4; }
+}
+@media (max-width: 360px) {
+  .form-card .choice-grid { grid-template-columns: 1fr; }
+}
+@media (pointer: coarse) { .nav > a, .nav .dd > button { padding: 13px 12px; } }
+.nav > a.btn-primary, .nav > a.btn-primary:hover { background: var(--accent); color: #fff; justify-content: center; }
+.nav > a.btn-primary:hover { background: var(--accent-2); }
