@@ -114,17 +114,7 @@ $$(".steps").forEach((wrap) => {
   schedule();
 });
 
-/* ---------- Shipping coverage tile map ---------- */
-const STATES = [
-  ["AK", "Alaska", 0, 0], ["ME", "Maine", 0, 10],
-  ["VT", "Vermont", 1, 9], ["NH", "New Hampshire", 1, 10],
-  ["WA", "Washington", 2, 0], ["ID", "Idaho", 2, 1], ["MT", "Montana", 2, 2], ["ND", "North Dakota", 2, 3], ["MN", "Minnesota", 2, 4], ["IL", "Illinois", 2, 5], ["WI", "Wisconsin", 2, 6], ["MI", "Michigan", 2, 7], ["NY", "New York", 2, 8], ["RI", "Rhode Island", 2, 9], ["MA", "Massachusetts", 2, 10],
-  ["OR", "Oregon", 3, 0], ["NV", "Nevada", 3, 1], ["WY", "Wyoming", 3, 2], ["SD", "South Dakota", 3, 3], ["IA", "Iowa", 3, 4], ["IN", "Indiana", 3, 5], ["OH", "Ohio", 3, 6], ["PA", "Pennsylvania", 3, 7], ["NJ", "New Jersey", 3, 8], ["CT", "Connecticut", 3, 9],
-  ["CA", "California", 4, 0], ["UT", "Utah", 4, 1], ["CO", "Colorado", 4, 2], ["NE", "Nebraska", 4, 3], ["MO", "Missouri", 4, 4], ["KY", "Kentucky", 4, 5], ["WV", "West Virginia", 4, 6], ["VA", "Virginia", 4, 7], ["MD", "Maryland", 4, 8], ["DE", "Delaware", 4, 9],
-  ["AZ", "Arizona", 5, 1], ["NM", "New Mexico", 5, 2], ["KS", "Kansas", 5, 3], ["AR", "Arkansas", 5, 4], ["TN", "Tennessee", 5, 5], ["NC", "North Carolina", 5, 6], ["SC", "South Carolina", 5, 7], ["DC", "Washington, D.C.", 5, 8],
-  ["OK", "Oklahoma", 6, 3], ["LA", "Louisiana", 6, 4], ["MS", "Mississippi", 6, 5], ["AL", "Alabama", 6, 6], ["GA", "Georgia", 6, 7],
-  ["HI", "Hawaii", 7, 0], ["TX", "Texas", 7, 3], ["FL", "Florida", 7, 8],
-];
+/* ---------- U.S. maps (hero + shipping-time map) ---------- */
 // Approximate geographic centers, used only for transit estimates.
 const CENTROIDS = {
   AL: [32.8, -86.8], AZ: [34.3, -111.7], AR: [34.9, -92.4], CA: [37.2, -119.5], CO: [39.0, -105.5], CT: [41.6, -72.7], DE: [39.0, -75.5], DC: [38.9, -77.0],
@@ -141,86 +131,280 @@ const miles = ([a, b], [c, d]) => {
 };
 const groundDays = (mi) => (mi <= 250 ? 1 : mi <= 750 ? 2 : mi <= 1300 ? 3 : mi <= 1900 ? 4 : 5);
 
-$$("[data-coverage-map]").forEach((root) => {
+const SVGNS = "http://www.w3.org/2000/svg";
+const svgEl = (tag, attrs = {}, parent) => {
+  const el = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(el);
+  return el;
+};
+let mapPromise;
+const loadMap = () => (mapPromise ||= fetch("/assets/us-states.json").then((r) => r.json()));
+
+function baseMap(container, data, hubs, label, pinScale = 1) {
+  const svg = svgEl("svg", { viewBox: data.viewBox, class: "us-svg", role: "img", "aria-label": label });
+  const states = svgEl("g", { class: "states" }, svg);
+  const paths = {};
+  data.states.forEach((s) => {
+    const p = svgEl("path", { d: s.d, "data-id": s.id }, states);
+    p.dataset.name = s.name;
+    if (hubs.some((h) => h.state === s.id)) p.classList.add("hub-state");
+    paths[s.id] = p;
+  });
+  const routes = svgEl("g", { class: "routes" }, svg);
+  const pins = svgEl("g", { class: "pins" }, svg);
+  hubs.forEach((h) => {
+    const g = svgEl("g", { class: "hub-pin", "data-hub": h.key, transform: `translate(${h.xy[0]} ${h.xy[1]}) scale(${pinScale})` }, pins);
+    svgEl("circle", { r: 26, class: "pin-pulse" }, g);
+    svgEl("circle", { r: 13, class: "pin-halo" }, g);
+    svgEl("circle", { r: 7, class: "pin-dot" }, g);
+    const t = svgEl("text", { y: -22, "text-anchor": "middle", class: "pin-label" }, g);
+    t.textContent = h.city.startsWith("[") ? h.label : `${h.city}, ${h.state}`;
+  });
+  container.appendChild(svg);
+  return { svg, paths, routes };
+}
+const centerOf = (path) => { const b = path.getBBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+function arc(from, to, lift = 0.25) {
+  const [x1, y1] = from, [x2, y2] = to;
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  return `M${x1},${y1} Q${mx},${my - dist * lift} ${x2},${y2}`;
+}
+function drawRoute(group, d, cls, duration) {
+  const p = svgEl("path", { d, class: cls }, group);
+  const len = p.getTotalLength();
+  p.style.strokeDasharray = len;
+  p.style.strokeDashoffset = reduceMotion ? 0 : len;
+  if (!reduceMotion) p.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration, easing: "cubic-bezier(.3,.7,.2,1)", fill: "forwards" });
+  return p;
+}
+const whenVisible = (el, cb) => {
+  if (!("IntersectionObserver" in window)) return cb(true);
+  new IntersectionObserver((es) => es.forEach((e) => cb(e.isIntersecting)), { threshold: 0.05 }).observe(el);
+};
+
+// Hero map: both hubs, live "shipments" flying out of the selected warehouse
+$$("[data-hero-map]").forEach(async (root) => {
   const hubs = JSON.parse(root.dataset.hubs);
-  const grid = $(".tile-map", root);
+  const data = await loadMap();
+  const { paths, routes } = baseMap(root, data, hubs, "Map of Boxio fulfillment centers in Utah and Florida", 1.9);
+  drawRoute(routes, arc(hubs[0].xy, hubs[1].xy, 0.32), "link-route", 1800);
+  let active = hubs[0].key, visible = false, timer;
+  const setActive = (key) => {
+    active = key;
+    root.querySelectorAll(".hub-pin").forEach((g) => g.classList.toggle("on", g.dataset.hub === key));
+    Object.values(paths).forEach((p) => p.classList.toggle("on", p.classList.contains("hub-state") && hubs.find((h) => h.key === key).state === p.dataset.id));
+  };
+  setActive(active);
+  const ids = Object.keys(paths).filter((id) => CENTROIDS[id]);
+  const ship = () => {
+    const hub = hubs.find((h) => h.key === active);
+    const id = ids[Math.floor(Math.random() * ids.length)];
+    if (id === hub.state) return;
+    const to = centerOf(paths[id]);
+    const r = drawRoute(routes, arc(hub.xy, to, 0.22), "ship-route", 1100);
+    const dot = svgEl("circle", { cx: to[0], cy: to[1], r: 0, class: "ship-dot" }, routes);
+    paths[id].classList.add("ping");
+    dot.animate([{ r: 0, opacity: 1 }, { r: 30, opacity: 0 }], { duration: 900, delay: 900, easing: "ease-out" });
+    setTimeout(() => { r.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, fill: "forwards" }); paths[id].classList.remove("ping"); }, 1500);
+    setTimeout(() => { r.remove(); dot.remove(); }, 2200);
+  };
+  const loop = () => { clearInterval(timer); if (visible && !reduceMotion && !document.hidden) timer = setInterval(ship, 650); };
+  whenVisible(root, (v) => { visible = v; loop(); });
+  document.addEventListener("visibilitychange", loop);
+  // Follow the Utah / Florida tabs
+  const tabs = root.closest("[data-tabs]");
+  tabs && $$('[role="tab"]', tabs).forEach((t) => t.addEventListener("click", () => setActive(t.id.replace("tab-", ""))));
+});
+
+// Shipping-time map: color states by estimated ground days, hover for details
+$$("[data-coverage-map]").forEach(async (root) => {
+  const hubs = JSON.parse(root.dataset.hubs);
+  const box = $(".us-map", root);
   const info = $(".map-info", root);
   const avgEl = $("[data-avg]", root);
-  let mode = root.dataset.mode || "both";
-  let active = root.dataset.focus || "TX";
+  let mode = "both", active = root.dataset.focus || "TX", line;
+  const data = await loadMap();
+  const { paths, routes } = baseMap(box, data, hubs, "U.S. map of estimated shipping times from Boxio warehouses");
 
-  const daysFor = (code) => {
-    const c = CENTROIDS[code];
+  const daysFor = (id) => {
+    const c = CENTROIDS[id];
     if (!c) return null;
     const out = {};
     hubs.forEach((h) => { out[h.key] = groundDays(miles(c, h.coords)); });
     return out;
   };
-  const pick = (d) => {
-    if (!d) return null;
-    if (mode !== "both") return d[mode];
-    return Math.min(...Object.values(d));
+  const pick = (d) => (!d ? null : mode === "both" ? Math.min(...Object.values(d)) : d[mode]);
+  const fastestHub = (d) => {
+    const pool = mode === "both" ? hubs : hubs.filter((h) => h.key === mode);
+    return pool.reduce((a, b) => (d[b.key] < d[a.key] ? b : a));
   };
 
-  const tiles = {};
-  grid.style.gridTemplateRows = "repeat(8, auto)";
-  STATES.forEach(([code, name, row, col]) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "tile";
-    b.textContent = code;
-    b.style.gridRow = row + 1;
-    b.style.gridColumn = col + 1;
-    b.setAttribute("aria-label", name);
-    if (hubs.some((h) => h.state === code)) b.classList.add("hub");
-    b.addEventListener("mouseenter", () => show(code));
-    b.addEventListener("focus", () => show(code));
-    b.addEventListener("click", () => show(code, true));
-    grid.appendChild(b);
-    tiles[code] = b;
+  Object.entries(paths).forEach(([id, p]) => {
+    p.setAttribute("tabindex", "0");
+    p.setAttribute("aria-label", p.dataset.name);
+    p.addEventListener("mouseenter", () => show(id));
+    p.addEventListener("focus", () => show(id));
+    p.addEventListener("click", () => show(id, true));
   });
+  box.addEventListener("mouseleave", () => show(active));
 
   function paint() {
     let sum = 0, n = 0;
-    STATES.forEach(([code]) => {
-      const d = pick(daysFor(code));
-      tiles[code].className = "tile" + (hubs.some((h) => h.state === code) ? " hub" : "") + " " + (d ? "d" + d : "d5") + (code === active ? " active" : "");
+    Object.entries(paths).forEach(([id, p]) => {
+      const d = pick(daysFor(id));
+      p.classList.remove("d1", "d2", "d3", "d4", "d5");
+      p.classList.add(d ? "d" + d : "d5");
       if (d) { sum += d; n++; }
     });
     if (avgEl) avgEl.textContent = (sum / n).toFixed(1);
+    show(active);
   }
-
-  function show(code, pin) {
-    if (pin) active = code;
-    const name = STATES.find((s) => s[0] === code)[1];
-    const d = daysFor(code);
-    let html = `<span class="fine">Estimated ground transit to</span><h3>${name}</h3>`;
+  function show(id, pin) {
+    if (pin) active = id;
+    const p = paths[id];
+    const d = daysFor(id);
+    let html = `<span class="fine">Estimated ground transit to</span><h3>${p.dataset.name}</h3>`;
+    if (line) { line.remove(); line = null; }
     if (!d) {
       html += `<p>Alaska and Hawaii ship via expedited / air services from either warehouse.</p>`;
     } else {
-      hubs.forEach((h) => {
-        html += `<div class="row"><span>From ${h.label}</span><strong>${d[h.key]} ${d[h.key] === 1 ? "day" : "days"}</strong></div>`;
-      });
-      const best = hubs.reduce((a, b) => (d[b.key] < d[a.key] ? b : a));
-      const tie = hubs.every((h) => d[h.key] === d[best.key]);
-      html += `<span class="best">${tie ? "Either warehouse works" : "Fastest: " + best.label}</span>`;
+      hubs.forEach((h) => { html += `<div class="row"><span>From ${h.label}</span><strong>${d[h.key]} ${d[h.key] === 1 ? "day" : "days"}</strong></div>`; });
+      const best = fastestHub(d);
+      const tie = mode === "both" && hubs.every((h) => d[h.key] === d[best.key]);
+      html += `<span class="best">${tie ? "Either warehouse works" : "Ships from " + best.label}</span>`;
+      if (id !== best.state) line = drawRoute(routes, arc(best.xy, centerOf(p), 0.2), "hover-route", 700);
     }
     info.innerHTML = html;
-    $$(".tile.active", grid).forEach((t) => t.classList.remove("active"));
-    tiles[active] && tiles[active].classList.add("active");
+    Object.values(paths).forEach((x) => x.classList.remove("active"));
+    p.classList.add("active");
+    p.parentNode.appendChild(p); // bring outline to front
   }
-
-  $$("[data-mode]", root).forEach((chip) => {
-    chip.addEventListener("click", () => {
-      mode = chip.dataset.mode;
-      $$("[data-mode]", root).forEach((c) => c.setAttribute("aria-pressed", c === chip));
-      paint();
-    });
-  });
-  grid.addEventListener("mouseleave", () => show(active));
+  $$("[data-mode]", root).forEach((chip) => chip.addEventListener("click", () => {
+    mode = chip.dataset.mode;
+    $$("[data-mode]", root).forEach((c) => c.setAttribute("aria-pressed", c === chip));
+    root.querySelectorAll(".hub-pin").forEach((g) => g.classList.toggle("dim", mode !== "both" && g.dataset.hub !== mode));
+    paint();
+  }));
   paint();
-  show(active, true);
 });
+
+/* ---------- Interactive backgrounds ---------- */
+// Dot grid that lights up around the cursor, with "packages" gliding along the rows. Click to send a ripple.
+function fxBackground(host) {
+  const c = document.createElement("canvas");
+  c.className = "fx-canvas";
+  c.setAttribute("aria-hidden", "true");
+  host.prepend(c);
+  const ctx = c.getContext("2d");
+  const GAP = 26;
+  let w = 0, h = 0, cols = 0, rows = 0, raf = 0, running = false;
+  const mouse = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4 };
+  const packets = [], ripples = [];
+  const resize = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = host.clientWidth; h = host.clientHeight;
+    c.width = w * dpr; c.height = h * dpr;
+    c.style.width = w + "px"; c.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(w / GAP) + 1; rows = Math.ceil(h / GAP) + 1;
+    if (!running) frame(performance.now());
+  };
+  const spawn = () => {
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    packets.push({ row: 1 + Math.floor(Math.random() * (rows - 2)), x: dir > 0 ? -40 : w + 40, dir, v: 0.6 + Math.random() * 1.1 });
+  };
+  function frame(t) {
+    ctx.clearRect(0, 0, w, h);
+    mouse.x += (mouse.tx - mouse.x) * 0.12;
+    mouse.y += (mouse.ty - mouse.y) * 0.12;
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const x = i * GAP, y = j * GAP;
+        const dm = Math.hypot(x - mouse.x, y - mouse.y);
+        let glow = Math.max(0, 1 - dm / 170);
+        for (const r of ripples) {
+          const dr = Math.abs(Math.hypot(x - r.x, y - r.y) - r.r);
+          if (dr < 24) glow = Math.max(glow, (1 - dr / 24) * r.a);
+        }
+        const wave = 0.5 + 0.5 * Math.sin(t * 0.0012 + (x + y) * 0.012);
+        ctx.fillStyle = glow > 0.02 ? `rgba(254,70,8,${0.25 + glow * 0.65})` : `rgba(11,14,26,${0.07 + wave * 0.07})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 1.1 + glow * 2.6, 0, 6.283);
+        ctx.fill();
+      }
+    }
+    for (let k = packets.length - 1; k >= 0; k--) {
+      const p = packets[k];
+      p.x += p.v * p.dir * (1 + Math.max(0, 1 - Math.abs(p.row * GAP - mouse.y) / 120) * 2);
+      const y = p.row * GAP;
+      const g = ctx.createLinearGradient(p.x - 90 * p.dir, y, p.x, y);
+      g.addColorStop(0, "rgba(254,70,8,0)"); g.addColorStop(1, "rgba(254,70,8,.45)");
+      ctx.strokeStyle = g; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(p.x - 90 * p.dir, y); ctx.lineTo(p.x, y); ctx.stroke();
+      ctx.fillStyle = "#fe4608";
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(p.x - 4, y - 4, 8, 8, 2) : ctx.rect(p.x - 4, y - 4, 8, 8); ctx.fill();
+      if (p.x < -120 || p.x > w + 120) packets.splice(k, 1);
+    }
+    for (let k = ripples.length - 1; k >= 0; k--) {
+      const r = ripples[k];
+      r.r += 6; r.a *= 0.965;
+      if (r.a < 0.03) ripples.splice(k, 1);
+    }
+    if (packets.length < Math.max(3, Math.round(w / 260)) && Math.random() < 0.03) spawn();
+    if (running) raf = requestAnimationFrame(frame);
+  }
+  const start = () => { if (running || reduceMotion) return; running = true; raf = requestAnimationFrame(frame); };
+  const stop = () => { running = false; cancelAnimationFrame(raf); };
+  host.addEventListener("pointermove", (e) => { const b = host.getBoundingClientRect(); mouse.tx = e.clientX - b.left; mouse.ty = e.clientY - b.top; });
+  host.addEventListener("pointerleave", () => { mouse.tx = mouse.ty = -1e4; });
+  host.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("a, button, input, select, textarea, label, iframe, svg")) return;
+    const b = host.getBoundingClientRect();
+    ripples.push({ x: e.clientX - b.left, y: e.clientY - b.top, r: 0, a: 1 });
+  });
+  window.addEventListener("resize", resize);
+  whenVisible(host, (v) => (v && !document.hidden ? start() : stop()));
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  resize();
+}
+$$(".hero, .page-hero").forEach(fxBackground);
+
+// Cursor spotlight on cards
+document.addEventListener("pointermove", (e) => {
+  const card = e.target.closest && e.target.closest(".card, .int, .form-card");
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  card.style.setProperty("--mx", e.clientX - r.left + "px");
+  card.style.setProperty("--my", e.clientY - r.top + "px");
+});
+
+// Gentle 3D tilt on the hero map card
+if (!reduceMotion && window.matchMedia("(pointer: fine)").matches) {
+  $$("[data-tilt]").forEach((el) => {
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
+    });
+    el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+  });
+}
+
+// Scroll progress bar
+(() => {
+  if (!header) return;
+  const bar = document.createElement("div");
+  bar.className = "scroll-progress";
+  header.appendChild(bar);
+  const set = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+  };
+  window.addEventListener("scroll", set, { passive: true });
+  set();
+})();
 
 /* ---------- Integrations filter ---------- */
 $$("[data-int-filter]").forEach((root) => {

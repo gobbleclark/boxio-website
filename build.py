@@ -11,6 +11,7 @@ Page content lives in src/pages/*.html.
 import json
 import re
 import shutil
+import struct
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -55,6 +56,13 @@ CONFIG = {
             "coords": [28.5, -81.4],  # TODO: set to the warehouse's lat/lng
         },
     },
+    # Customer logos shown in the "Trusted by" strip (files in src/assets/logos/). Order = display order.
+    "customers": [
+        ("Redmond", "redmond.svg"), ("Walli", "walli.png"), ("Mabē", "mabe.png"), ("AAPC", "aapc.png"),
+        ("Clean Monday Meals", "cleanmonday.png"), ("Ballerina Farm", "ballerinafarm.png"), ("Signal Relief", "signalrelief.png"),
+        ("Brixley Bags", "brixley.png"), ("Teddy + Rose", "teddyrose.png"), ("TEAMM8", "teamm8.png"), ("Super Patch", "superpatch.svg"),
+        ("Kindly Camera Bags", "kindly.png"), ("Lates by Kate", "latesbykate.png"), ("Pressed Floral", "pressedfloral.svg"), ("Yonder", "yonder.png"),
+    ],
     "integrations": {
         "store": ["Shopify", "WooCommerce", "BigCommerce", "Magento", "Squarespace", "Volusion", "QuickBooks Commerce"],
         "market": ["Amazon", "Walmart", "eBay", "Etsy", "Wayfair", "Overstock", "Google Shopping"],
@@ -176,6 +184,24 @@ LOGO = ('<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+def albers_usa(lon, lat):
+    """Project lon/lat to the 975x610 Albers USA frame used by src/assets/us-states.json (lower 48 only)."""
+    from math import radians, sin, cos, sqrt
+    phi0, phi1 = radians(29.5), radians(45.5)
+    n = (sin(phi0) + sin(phi1)) / 2
+    c = 1 + sin(phi0) * (2 * n - sin(phi0))
+    r0 = sqrt(c) / n
+
+    def raw(lam, phi):
+        r = sqrt(c - 2 * n * sin(phi)) / n
+        return r * sin(lam * n), r0 - r * cos(lam * n)
+
+    k, tx, ty = 1300, 487.5, 305
+    cx, cy = raw(radians(-0.6), radians(38.7))
+    px, py = raw(radians(lon + 96), radians(lat))
+    return [round(tx + k * (px - cx), 1), round(ty - k * (py - cy), 1)]
+
+
 def loc_tokens():
     t = {}
     for key, L in CONFIG["locations"].items():
@@ -192,7 +218,7 @@ def loc_tokens():
     t["brand"] = CONFIG["brand"]
     t["year"] = str(date.today().year)
     t["hubs_json"] = escape(json.dumps([
-        {"key": k, "label": L["label"], "state": L["state"], "coords": L["coords"]} for k, L in CONFIG["locations"].items()
+        {"key": k, "label": L["label"], "city": L["city"], "state": L["state"], "coords": L["coords"], "xy": albers_usa(L["coords"][1], L["coords"][0])} for k, L in CONFIG["locations"].items()
     ]))
     return t
 
@@ -206,6 +232,30 @@ def fill(text):
         text = text.replace("{{" + k + "}}", v)
     return text
 
+
+def logo_size(path, area=4600, max_h=46, max_w=215):
+    """Size logos to a similar visual area so wide wordmarks and tall marks look balanced."""
+    data = path.read_bytes()
+    if path.suffix == ".png":
+        w, h = struct.unpack(">II", data[16:24])
+    else:
+        vb = re.search(rb'viewBox="[\d.\s-]*?([\d.]+)[\s,]+([\d.]+)"', data)
+        w, h = float(vb.group(1)), float(vb.group(2))
+    r = w / h
+    hh = min(max_h, (area / r) ** 0.5, max_w / r)
+    return round(hh * r), round(hh)
+
+
+def customer_logos_html():
+    def li(n, f):
+        w, h = logo_size(SRC / "assets" / "logos" / f)
+        return f'<li><img src="/assets/logos/{f}" alt="{escape(n)}" width="{w}" height="{h}" loading="lazy" decoding="async"></li>'
+    items = "".join(li(n, f) for n, f in CONFIG["customers"])
+    dup = items.replace('alt="', 'aria-hidden="true" alt="')
+    return f"""<section class="logos" aria-label="Brands that ship with Boxio">
+  <div class="container"><p class="logos-title">Trusted by growing brands across the U.S.</p></div>
+  <div class="logo-marquee"><ul class="logo-track">{items}{dup}</ul></div>
+</section>"""
 
 def faq_html(key):
     items = "".join(
@@ -386,7 +436,7 @@ def render(path, src_name, title, desc, crumb):
     crumbs = ""
     if crumb:
         crumbs = f'<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">{escape(crumb)}</li></ol></nav>'
-    body = body.replace("{{crumbs}}", crumbs)
+    body = body.replace("{{crumbs}}", crumbs).replace("{{customer_logos}}", customer_logos_html())
     canonical = CONFIG["site_url"] + path
     geo = ""
     if path == "/utah-fulfillment-center/":
@@ -436,8 +486,7 @@ def main():
     if DIST.exists():
         shutil.rmtree(DIST)
     (DIST / "assets").mkdir(parents=True)
-    for f in (SRC / "assets").iterdir():
-        shutil.copy(f, DIST / "assets" / f.name)
+    shutil.copytree(SRC / "assets", DIST / "assets", dirs_exist_ok=True)
     (DIST / "assets" / "logo.svg").write_text(LOGO.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" '))
 
     for path, src_name, title, desc, crumb in PAGES:

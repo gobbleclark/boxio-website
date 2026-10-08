@@ -1,9 +1,8 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="reveal">
-      <span class="eyebrow">3PL · Utah &amp; Florida</span>
-      <h1>Ecommerce fulfillment from <span class="hl">Utah and Florida</span></h1>
-      <p class="lede">We ship orders fast, so you can grow faster. Boxio picks, packs and ships for growing DTC brands from two fulfillment centers, so your customers get their orders sooner on both sides of the country.</p>
+      <h1><span class="h1-kicker">Ecommerce fulfillment &amp; 3PL in Utah and Florida</span>A full-service shipping department that feels like an <span class="hl">extension of your in-house team</span></h1>
+      <p class="lede">We ship orders fast, so you can grow faster. Boxio picks, packs and ships for growing DTC brands from fulfillment centers in Utah and Florida, so your customers get their orders sooner on both sides of the country.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="/request-a-quote/">Get a free quote {{icon:arrow}}</a>
         <a class="btn btn-ghost" href="#shipping-map">See shipping times</a>
@@ -15,20 +14,12 @@
       </div>
     </div>
 
-    <div class="hub-card reveal" data-tabs>
+    <div class="hub-card reveal" data-tabs data-tilt>
       <div class="hub-tabs" role="tablist" aria-label="Fulfillment centers">
         <button role="tab" id="tab-ut" aria-controls="panel-ut" aria-selected="true">Utah</button>
         <button role="tab" id="tab-fl" aria-controls="panel-fl" aria-selected="false" tabindex="-1">Florida</button>
       </div>
-      <div class="route" aria-hidden="true">
-        <svg viewBox="0 0 400 120" preserveAspectRatio="none">
-          <path class="dash" d="M60 70 C 150 10, 250 10, 340 80" fill="none" stroke="#ff7a45" stroke-width="3"/>
-          <circle cx="60" cy="70" r="9" fill="#fe4608"/><circle cx="60" cy="70" r="16" fill="none" stroke="#fe4608" stroke-opacity=".4" stroke-width="2"/>
-          <circle cx="340" cy="80" r="9" fill="#fe4608"/><circle cx="340" cy="80" r="16" fill="none" stroke="#fe4608" stroke-opacity=".4" stroke-width="2"/>
-          <text x="60" y="104" fill="#b0afac" font-size="13" font-family="Manrope,sans-serif" font-weight="700" text-anchor="middle">UTAH</text>
-          <text x="340" y="112" fill="#b0afac" font-size="13" font-family="Manrope,sans-serif" font-weight="700" text-anchor="middle">FLORIDA</text>
-        </svg>
-      </div>
+      <div class="hero-map" data-hero-map data-hubs="{{hubs_json}}"></div>
       <div class="hub-panel" id="panel-ut" role="tabpanel" aria-labelledby="tab-ut">
         <h3>Springville, Utah</h3>
         <p class="addr">{{ut_full}}</p>
@@ -53,12 +44,7 @@
   </div>
 </section>
 
-<div class="marquee" aria-label="Platforms we integrate with">
-  <div class="marquee-track">
-    <span>Shopify</span><span>Amazon</span><span>Walmart</span><span>WooCommerce</span><span>BigCommerce</span><span>Etsy</span><span>eBay</span><span>Wayfair</span><span>ShipStation</span><span>Magento</span><span>Squarespace</span><span>UPS</span><span>FedEx</span><span>USPS</span><span>DHL</span>
-    <span aria-hidden="true">Shopify</span><span aria-hidden="true">Amazon</span><span aria-hidden="true">Walmart</span><span aria-hidden="true">WooCommerce</span><span aria-hidden="true">BigCommerce</span><span aria-hidden="true">Etsy</span><span aria-hidden="true">eBay</span><span aria-hidden="true">Wayfair</span><span aria-hidden="true">ShipStation</span><span aria-hidden="true">Magento</span><span aria-hidden="true">Squarespace</span><span aria-hidden="true">UPS</span><span aria-hidden="true">FedEx</span><span aria-hidden="true">USPS</span><span aria-hidden="true">DHL</span>
-  </div>
-</div>
+{{customer_logos}}
 
 <section>
   <div class="container">
