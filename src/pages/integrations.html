@@ -1,0 +1,49 @@
+<section class="page-hero">
+  <div class="container">
+    {{crumbs}}
+    <div class="section-head reveal">
+      <span class="eyebrow">Integrations</span>
+      <h1>Connect your store. We'll handle the rest.</h1>
+      <p class="lede">Boxio connects with the ecommerce platforms, marketplaces and carriers you already use. Products and orders import automatically, and tracking flows back. Need something custom? Our engineers build API integrations too.</p>
+    </div>
+
+    <div data-int-filter class="reveal">
+      <div class="int-tools">
+        <div class="search">{{icon:search}}<input type="search" placeholder="Search integrations…" aria-label="Search integrations"></div>
+        <div class="map-controls" style="margin:0" role="group" aria-label="Filter by category">
+          <button class="chip" type="button" data-cat="all" aria-pressed="true">All</button>
+          <button class="chip" type="button" data-cat="store" aria-pressed="false">Store platforms</button>
+          <button class="chip" type="button" data-cat="market" aria-pressed="false">Marketplaces</button>
+          <button class="chip" type="button" data-cat="shipping" aria-pressed="false">Shipping &amp; carriers</button>
+        </div>
+      </div>
+      <div class="int-grid">
+        <div class="int" data-cat="store" data-name="Shopify"><span class="mono" style="background:#5e8e3e">S</span><strong>Shopify</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="WooCommerce"><span class="mono" style="background:#7f54b3">W</span><strong>WooCommerce</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="BigCommerce"><span class="mono" style="background:#34313f">B</span><strong>BigCommerce</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="Magento Adobe Commerce"><span class="mono" style="background:#e85d22">M</span><strong>Magento</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="Squarespace"><span class="mono" style="background:#111">S</span><strong>Squarespace</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="Volusion"><span class="mono" style="background:#3a6fd8">V</span><strong>Volusion</strong><small>Store platform</small></div>
+        <div class="int" data-cat="store" data-name="QuickBooks Commerce"><span class="mono" style="background:#2ca01c">Q</span><strong>QuickBooks Commerce</strong><small>Inventory &amp; orders</small></div>
+        <div class="int" data-cat="market" data-name="Amazon"><span class="mono" style="background:#232f3e">a</span><strong>Amazon</strong><small>Marketplace</small></div>
+        <div class="int" data-cat="market" data-name="Walmart"><span class="mono" style="background:#0071ce">W</span><strong>Walmart</strong><small>Marketplace</small></div>
+        <div class="int" data-cat="market" data-name="eBay"><span class="mono" style="background:#e53238">e</span><strong>eBay</strong><small>Marketplace</small></div>
+        <div class="int" data-cat="market" data-name="Etsy"><span class="mono" style="background:#f1641e">E</span><strong>Etsy</strong><small>Marketplace</small></div>
+        <div class="int" data-cat="market" data-name="Wayfair"><span class="mono" style="background:#7b189f">W</span><strong>Wayfair</strong><small>Marketplace &amp; dropship</small></div>
+        <div class="int" data-cat="market" data-name="Overstock"><span class="mono" style="background:#c8102e">O</span><strong>Overstock</strong><small>Marketplace &amp; dropship</small></div>
+        <div class="int" data-cat="market" data-name="Google Shopping"><span class="mono" style="background:#4285f4">G</span><strong>Google Shopping</strong><small>Marketplace</small></div>
+        <div class="int" data-cat="shipping" data-name="ShipStation"><span class="mono" style="background:#84c225">S</span><strong>ShipStation</strong><small>Shipping platform</small></div>
+        <div class="int" data-cat="shipping" data-name="UPS"><span class="mono" style="background:#351c15">U</span><strong>UPS</strong><small>Carrier</small></div>
+        <div class="int" data-cat="shipping" data-name="FedEx"><span class="mono" style="background:#4d148c">F</span><strong>FedEx</strong><small>Carrier</small></div>
+        <div class="int" data-cat="shipping" data-name="USPS"><span class="mono" style="background:#004b87">U</span><strong>USPS</strong><small>Carrier</small></div>
+        <div class="int" data-cat="shipping" data-name="DHL"><span class="mono" style="background:#d40511">D</span><strong>DHL</strong><small>Carrier · International</small></div>
+        <div class="int" data-cat="shipping" data-name="FirstMile"><span class="mono" style="background:#1d3557">F</span><strong>FirstMile</strong><small>Carrier</small></div>
+        <div class="int" data-cat="shipping" data-name="Asendia"><span class="mono" style="background:#00205b">A</span><strong>Asendia</strong><small>Carrier · International</small></div>
+        <div class="int" data-cat="store" data-name="Custom API"><span class="mono" style="background:var(--accent)">{}</span><strong>Custom API</strong><small>For custom builds</small></div>
+      </div>
+      <p class="empty" hidden>No matches. We probably still support it. <a href="/contact/">Ask us</a>.</p>
+    </div>
+  </div>
+</section>
+
+{{partial:cta}}

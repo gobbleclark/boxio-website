@@ -1,0 +1,29 @@
+<form class="card" action="/request-a-quote/" method="get" data-quick-quote style="padding:28px">
+  <h3>Start your free quote</h3>
+  <p style="margin-bottom:18px">Takes about 60 seconds.</p>
+  <div class="field">
+    <label for="qq-orders">Monthly orders</label>
+    <select id="qq-orders" name="orders">
+      <option value="0">Under 100</option>
+      <option value="1">100–500</option>
+      <option value="2" selected>500–1,000</option>
+      <option value="3">1,000–5,000</option>
+      <option value="4">5,000–10,000</option>
+      <option value="5">10,000+</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="qq-hub">Ship from</label>
+    <select id="qq-hub" name="hub">
+      <option value="Help me decide">Help me decide</option>
+      <option value="Utah">Utah</option>
+      <option value="Florida">Florida</option>
+      <option value="Both">Both</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="qq-email">Work email</label>
+    <input id="qq-email" name="email" type="email" placeholder="you@brand.com" autocomplete="email">
+  </div>
+  <button class="btn btn-primary" type="submit" style="width:100%">Continue {{icon:arrow}}</button>
+</form>
