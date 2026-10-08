@@ -564,3 +564,10 @@ fieldset { min-width: 0; }
 @media (pointer: coarse) { .nav > a, .nav .dd > button { padding: 13px 12px; } }
 .nav > a.btn-primary, .nav > a.btn-primary:hover { background: var(--accent); color: #fff; justify-content: center; }
 .nav > a.btn-primary:hover { background: var(--accent-2); }
+
+/* Legal pages */
+.legal { font-size: 1rem; }
+.legal h2 { font-size: 1.45rem; margin-top: 2em; }
+.legal h3 { font-size: 1.15rem; margin-top: 1.6em; }
+.legal h4 { font-size: 1rem; margin-top: 1.4em; }
+.legal p, .legal li { color: var(--ink-2); overflow-wrap: anywhere; }

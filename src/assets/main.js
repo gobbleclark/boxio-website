@@ -335,6 +335,8 @@ function fxBackground(host) {
   let w = 0, h = 0, cols = 0, rows = 0, raf = 0, running = false;
   const mouse = { x: -1e4, y: -1e4, tx: -1e4, ty: -1e4 };
   const packets = [], ripples = [];
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  let last = 0;
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     w = host.clientWidth; h = host.clientHeight;
@@ -346,9 +348,13 @@ function fxBackground(host) {
   };
   const spawn = () => {
     const dir = Math.random() < 0.5 ? 1 : -1;
-    packets.push({ row: 1 + Math.floor(Math.random() * (rows - 2)), x: dir > 0 ? -40 : w + 40, dir, v: 0.6 + Math.random() * 1.1 });
+    // Speed in px per second; phones get faster packets since there's no cursor to speed them up
+    const base = touch ? 140 : 70;
+    packets.push({ row: 1 + Math.floor(Math.random() * (rows - 2)), x: dir > 0 ? -40 : w + 40, dir, v: base + Math.random() * base });
   };
   function frame(t) {
+    const dt = last ? Math.min(0.05, (t - last) / 1000) : 1 / 60; // seconds since last frame (capped)
+    last = t;
     ctx.clearRect(0, 0, w, h);
     mouse.x += (mouse.tx - mouse.x) * 0.12;
     mouse.y += (mouse.ty - mouse.y) * 0.12;
@@ -370,7 +376,7 @@ function fxBackground(host) {
     }
     for (let k = packets.length - 1; k >= 0; k--) {
       const p = packets[k];
-      p.x += p.v * p.dir * (1 + Math.max(0, 1 - Math.abs(p.row * GAP - mouse.y) / 120) * 2);
+      p.x += p.v * dt * p.dir * (1 + Math.max(0, 1 - Math.abs(p.row * GAP - mouse.y) / 120) * 2);
       const y = p.row * GAP;
       const g = ctx.createLinearGradient(p.x - 90 * p.dir, y, p.x, y);
       g.addColorStop(0, "rgba(91,82,201,0)"); g.addColorStop(1, "rgba(91,82,201,.45)");
@@ -382,13 +388,13 @@ function fxBackground(host) {
     }
     for (let k = ripples.length - 1; k >= 0; k--) {
       const r = ripples[k];
-      r.r += 6; r.a *= 0.965;
+      r.r += 360 * dt; r.a *= Math.pow(0.965, dt * 60);
       if (r.a < 0.03) ripples.splice(k, 1);
     }
-    if (packets.length < Math.max(3, Math.round(w / 260)) && Math.random() < 0.03) spawn();
+    if (packets.length < Math.max(3, Math.round(w / 260)) && Math.random() < 1.8 * dt) spawn();
     if (running) raf = requestAnimationFrame(frame);
   }
-  const start = () => { if (running || reduceMotion) return; running = true; raf = requestAnimationFrame(frame); };
+  const start = () => { if (running || reduceMotion) return; running = true; last = 0; raf = requestAnimationFrame(frame); };
   const stop = () => { running = false; cancelAnimationFrame(raf); };
   host.addEventListener("pointermove", (e) => { const b = host.getBoundingClientRect(); mouse.tx = e.clientX - b.left; mouse.ty = e.clientY - b.top; });
   host.addEventListener("pointerleave", () => { mouse.tx = mouse.ty = -1e4; });

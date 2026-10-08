@@ -57,6 +57,8 @@ CONFIG = {
             "coords": [30.33, -81.80],
         },
     },
+    # Google Search Console "HTML tag" verification: paste only the content="..." value. Leave empty if verified by DNS.
+    "google_site_verification": "",
     # Sales rep booking calendar on the Free Quote page. Paste the Calendly event link,
     # e.g. "https://calendly.com/justin-boxio/30min". Leave empty to show a call button instead.
     "sales_rep": {"name": "Justin", "calendly": "https://calendly.com/justin-boxioship/boxio-intro-call"},
@@ -105,6 +107,14 @@ PAGES = [
      "Contact Boxio 3PL | Utah & Florida Fulfillment Centers",
      "Contact Boxio fulfillment. Call, email or send a message to our Springville, Utah or Florida warehouse team.",
      "Contact"),
+    ("/privacy/", "privacy.html",
+     "Privacy Policy | Boxio",
+     "How Boxio collects, uses and protects information submitted through boxioship.com.",
+     "Privacy Policy"),
+    ("/terms/", "terms.html",
+     "Terms & Conditions | Boxio",
+     "Terms and conditions governing use of the boxioship.com website.",
+     "Terms & Conditions"),
 ]
 
 # Old URLs on the current site -> new URLs (301). Written to _redirects and .htaccess.
@@ -478,6 +488,8 @@ def render(path, src_name, title, desc, crumb):
         geo = '<meta name="geo.region" content="US-UT">\n<meta name="geo.placename" content="Springville, Utah">\n'
     if path == "/florida-fulfillment-center/":
         geo = '<meta name="geo.region" content="US-FL">\n<meta name="geo.placename" content="{{fl_city}}, Florida">\n'
+    gsv = CONFIG["google_site_verification"].strip()
+    gsv = f'\n<meta name="google-site-verification" content="{escape(gsv)}">' if gsv and path == "/" else ""
     html = f"""<!doctype html>
 <html lang="en" class="no-js">
 <head>
@@ -494,7 +506,7 @@ def render(path, src_name, title, desc, crumb):
 <meta property="og:url" content="{canonical}">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#29254f">
+<meta name="theme-color" content="#29254f">{gsv}
 <link rel="icon" href="/assets/brand/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/brand/icon.png">
 <meta property="og:image" content="{CONFIG['site_url']}/assets/brand/logo-large.png">
