@@ -6,13 +6,36 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/shipping-supply-chain-product", "destination": "/services/", "permanent": true },
-    { "source": "/partner-request", "destination": "/contact/", "permanent": true }
+    {
+      "source": "/shipping-supply-chain-product",
+      "destination": "/services/",
+      "permanent": true
+    },
+    {
+      "source": "/shipping-supply-chain-product/",
+      "destination": "/services/",
+      "permanent": true
+    },
+    {
+      "source": "/partner-request",
+      "destination": "/contact/",
+      "permanent": true
+    },
+    {
+      "source": "/partner-request/",
+      "destination": "/contact/",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/assets/(integrations|logos|brand)/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
     }
   ]
 }
