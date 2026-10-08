@@ -2,11 +2,10 @@
 
 /*
  * FORM DELIVERY
- * Set FORM_ENDPOINT to a form backend URL (Formspree, Basin, HubSpot, Zapier webhook,
- * or your own API). Submissions are POSTed as JSON.
- * While it's empty, forms fall back to opening the visitor's email app addressed to FORM_EMAIL.
+ * Quote and contact forms POST to the "website-lead" Supabase Edge Function, which saves each
+ * submission to the website_leads table (source: supabase/functions/website-lead/index.ts).
  */
-const FORM_ENDPOINT = "";
+const FORM_ENDPOINT = "https://qwepujelixixxssetjcl.supabase.co/functions/v1/website-lead";
 const FORM_EMAIL = "hello@boxioship.com";
 
 document.documentElement.classList.remove("no-js");
@@ -184,36 +183,70 @@ const whenVisible = (el, cb) => {
   new IntersectionObserver((es) => es.forEach((e) => cb(e.isIntersecting)), { threshold: 0.05 }).observe(el);
 };
 
-// Hero map: both hubs, live "shipments" flying out of the selected warehouse
+// Hero map: packages fly out of BOTH warehouses, each from the hub closest to its destination
 $$("[data-hero-map]").forEach(async (root) => {
   const hubs = JSON.parse(root.dataset.hubs);
   const data = await loadMap();
-  const { paths, routes } = baseMap(root, data, hubs, "Map of Boxio fulfillment centers in Utah and Florida", 1.9);
+  const { paths, routes } = baseMap(root, data, hubs, "Map of Boxio fulfillment centers in Utah and Florida shipping orders nationwide", 1.9);
   drawRoute(routes, arc(hubs[0].xy, hubs[1].xy, 0.32), "link-route", 1800);
-  let active = hubs[0].key, visible = false, timer;
+  let active = hubs[0].key, visible = false, timer, raf = 0;
   const setActive = (key) => {
     active = key;
     root.querySelectorAll(".hub-pin").forEach((g) => g.classList.toggle("on", g.dataset.hub === key));
     Object.values(paths).forEach((p) => p.classList.toggle("on", p.classList.contains("hub-state") && hubs.find((h) => h.key === key).state === p.dataset.id));
+    routes.querySelectorAll(".ship-route, .ship-box").forEach((el) => el.classList.toggle("dim", el.dataset.hub !== key));
   };
   setActive(active);
+
   const ids = Object.keys(paths).filter((id) => CENTROIDS[id]);
-  const ship = () => {
-    const hub = hubs.find((h) => h.key === active);
-    const id = ids[Math.floor(Math.random() * ids.length)];
-    if (id === hub.state) return;
-    const to = centerOf(paths[id]);
-    const r = drawRoute(routes, arc(hub.xy, to, 0.22), "ship-route", 1100);
-    const dot = svgEl("circle", { cx: to[0], cy: to[1], r: 0, class: "ship-dot" }, routes);
-    paths[id].classList.add("ping");
-    dot.animate([{ r: 0, opacity: 1 }, { r: 30, opacity: 0 }], { duration: 900, delay: 900, easing: "ease-out" });
-    setTimeout(() => { r.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, fill: "forwards" }); paths[id].classList.remove("ping"); }, 1500);
-    setTimeout(() => { r.remove(); dot.remove(); }, 2200);
+  const nearestHub = (id) => hubs.reduce((a, b) => (miles(CENTROIDS[id], b.coords) < miles(CENTROIDS[id], a.coords) ? b : a));
+  const flights = [];
+  const DURATION = 1500;
+  const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+  const tick = (now) => {
+    for (let i = flights.length - 1; i >= 0; i--) {
+      const f = flights[i];
+      const t = Math.min(1, (now - f.start) / DURATION);
+      const e = ease(t);
+      f.path.style.strokeDashoffset = f.len * (1 - e);
+      const pt = f.path.getPointAtLength(f.len * e);
+      f.box.setAttribute("transform", `translate(${pt.x} ${pt.y})`);
+      if (t === 1) {
+        flights.splice(i, 1);
+        f.box.remove();
+        paths[f.id].classList.add("ping");
+        const ring = svgEl("circle", { cx: f.to[0], cy: f.to[1], r: 0, class: "ship-dot" }, routes);
+        ring.animate([{ r: 0, opacity: 1 }, { r: 30, opacity: 0 }], { duration: 800, easing: "ease-out", fill: "forwards" });
+        f.path.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, delay: 250, fill: "forwards" });
+        setTimeout(() => { paths[f.id].classList.remove("ping"); f.path.remove(); ring.remove(); }, 1000);
+      }
+    }
+    raf = flights.length ? requestAnimationFrame(tick) : 0;
   };
-  const loop = () => { clearInterval(timer); if (visible && !reduceMotion && !document.hidden) timer = setInterval(ship, 650); };
+
+  // Alternate hubs so both are always busy; destination is any state that hub serves best
+  let turn = 0;
+  const ship = () => {
+    const hub = hubs[turn++ % hubs.length];
+    const pool = ids.filter((id) => id !== hub.state && nearestHub(id) === hub);
+    const id = pool[Math.floor(Math.random() * pool.length)];
+    if (!id) return;
+    const to = centerOf(paths[id]);
+    const path = svgEl("path", { d: arc(hub.xy, to, 0.22), class: "ship-route", "data-hub": hub.key }, routes);
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+    const box = svgEl("g", { class: "ship-box", "data-hub": hub.key }, routes);
+    svgEl("rect", { x: -9, y: -9, width: 18, height: 18, rx: 4 }, box);
+    if (hub.key !== active) { path.classList.add("dim"); box.classList.add("dim"); }
+    flights.push({ path, box, len, to, id, start: performance.now() });
+    if (!raf) raf = requestAnimationFrame(tick);
+  };
+  const loop = () => { clearInterval(timer); if (visible && !reduceMotion && !document.hidden) timer = setInterval(ship, 450); };
   whenVisible(root, (v) => { visible = v; loop(); });
   document.addEventListener("visibilitychange", loop);
-  // Follow the Utah / Florida tabs
+  // The Utah / Florida tabs spotlight one warehouse; both keep shipping
   const tabs = root.closest("[data-tabs]");
   tabs && $$('[role="tab"]', tabs).forEach((t) => t.addEventListener("click", () => setActive(t.id.replace("tab-", ""))));
 });
@@ -329,7 +362,7 @@ function fxBackground(host) {
           if (dr < 24) glow = Math.max(glow, (1 - dr / 24) * r.a);
         }
         const wave = 0.5 + 0.5 * Math.sin(t * 0.0012 + (x + y) * 0.012);
-        ctx.fillStyle = glow > 0.02 ? `rgba(254,70,8,${0.25 + glow * 0.65})` : `rgba(11,14,26,${0.07 + wave * 0.07})`;
+        ctx.fillStyle = glow > 0.02 ? `rgba(91,82,201,${0.25 + glow * 0.65})` : `rgba(41,37,79,${0.08 + wave * 0.07})`;
         ctx.beginPath();
         ctx.arc(x, y, 1.1 + glow * 2.6, 0, 6.283);
         ctx.fill();
@@ -340,10 +373,10 @@ function fxBackground(host) {
       p.x += p.v * p.dir * (1 + Math.max(0, 1 - Math.abs(p.row * GAP - mouse.y) / 120) * 2);
       const y = p.row * GAP;
       const g = ctx.createLinearGradient(p.x - 90 * p.dir, y, p.x, y);
-      g.addColorStop(0, "rgba(254,70,8,0)"); g.addColorStop(1, "rgba(254,70,8,.45)");
+      g.addColorStop(0, "rgba(91,82,201,0)"); g.addColorStop(1, "rgba(91,82,201,.45)");
       ctx.strokeStyle = g; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(p.x - 90 * p.dir, y); ctx.lineTo(p.x, y); ctx.stroke();
-      ctx.fillStyle = "#fe4608";
+      ctx.fillStyle = "#29254f";
       ctx.beginPath(); ctx.roundRect ? ctx.roundRect(p.x - 4, y - 4, 8, 8, 2) : ctx.rect(p.x - 4, y - 4, 8, 8); ctx.fill();
       if (p.x < -120 || p.x > w + 120) packets.splice(k, 1);
     }
@@ -441,18 +474,16 @@ function validateField(field) {
   field.classList.toggle("invalid", !ok);
   return ok;
 }
-async function deliver(subject, data) {
-  if (FORM_ENDPOINT) {
-    const res = await fetch(FORM_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ _subject: subject, ...data }),
-    });
-    if (!res.ok) throw new Error("Form endpoint returned " + res.status);
-    return;
+async function deliver(formType, data) {
+  const res = await fetch(FORM_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ form_type: formType, data, page_url: location.href }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Form endpoint returned " + res.status);
   }
-  const body = Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n");
-  window.location.href = `mailto:${FORM_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 const collect = (form) => {
   const fd = new FormData(form);
@@ -525,7 +556,7 @@ $$("[data-wizard]").forEach((form) => {
     submit.disabled = true;
     submit.textContent = "Sending…";
     try {
-      await deliver(`Free quote request — ${data["Company"] || data["Name"]}`, data);
+      await deliver("quote", data);
       const rows = ["Monthly orders", "Preferred warehouse", "Sales channels", "Services"].filter((k) => data[k]).map((k) => `<div><dt>${k}</dt><dd>${escapeHtml(data[k])}</dd></div>`).join("");
       form.innerHTML = `<div class="success" role="status" tabindex="-1">
         <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -536,10 +567,31 @@ $$("[data-wizard]").forEach((form) => {
     } catch (err) {
       submit.disabled = false;
       submit.textContent = "Get my free quote";
-      alert(`Sorry, something went wrong sending your request. Please email ${FORM_EMAIL} or call us.`);
+      alert(err.message.startsWith("Form endpoint") ? `Sorry, something went wrong sending your request. Please email ${FORM_EMAIL} or call us.` : err.message);
     }
   });
   render();
+});
+
+/* ---------- Calendly booking (loaded only when scrolled into view) ---------- */
+$$("[data-calendly]").forEach((box) => {
+  const load = () => {
+    if (box.dataset.loaded) return;
+    box.dataset.loaded = "1";
+    const widget = document.createElement("div");
+    widget.className = "calendly-inline-widget";
+    widget.dataset.url = box.dataset.calendly;
+    box.replaceChildren(widget);
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.head.appendChild(script);
+  };
+  if (!("IntersectionObserver" in window)) return load();
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) { io.disconnect(); load(); }
+  }, { rootMargin: "400px" });
+  io.observe(box);
 });
 
 /* ---------- Simple forms (contact, quick quote) ---------- */
@@ -554,14 +606,14 @@ $$("[data-simple-form]").forEach((form) => {
     btn.disabled = true;
     const data = collect(form);
     try {
-      await deliver(form.dataset.subject || "Website message", data);
+      await deliver(form.dataset.formType || "contact", data);
       form.innerHTML = `<div class="success" role="status" tabindex="-1">
         <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
         <h2>Message sent</h2><p class="lede" style="margin:0 auto">Thanks for reaching out. We'll get back to you within one business day.</p></div>`;
       $(".success", form).focus();
     } catch (err) {
       btn.disabled = false;
-      alert(`Sorry, something went wrong. Please email ${FORM_EMAIL} or call us.`);
+      alert(err.message.startsWith("Form endpoint") ? `Sorry, something went wrong. Please email ${FORM_EMAIL} or call us.` : err.message);
     }
   });
   $$(".field input, .field select, .field textarea", form).forEach((el) => el.addEventListener("blur", () => validateField(el.closest(".field"))));

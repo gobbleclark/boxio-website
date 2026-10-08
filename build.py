@@ -43,31 +43,30 @@ CONFIG = {
             "coords": [40.165, -111.64],
         },
         "fl": {
-            # TODO: replace every [bracketed] value with the real Florida details.
             "name": "Boxio Fulfillment — Florida",
             "label": "Florida",
-            "street": "[Florida street address]",
-            "city": "[City]",
+            "street": "2730 Pickettville Road, Unit 105",
+            "city": "Jacksonville",
             "state": "FL",
             "state_name": "Florida",
-            "zip": "[ZIP]",
-            "phone": "[Florida phone]",
+            "zip": "32220",
+            # No local Florida line yet — uses the main number. Swap in a 904 number if you get one.
+            "phone": "(801) 960-4373",
             "path": "/florida-fulfillment-center/",
-            "coords": [28.5, -81.4],  # TODO: set to the warehouse's lat/lng
+            # Approximate; used only for the map pin and transit-time estimates.
+            "coords": [30.33, -81.80],
         },
     },
+    # Sales rep booking calendar on the Free Quote page. Paste the Calendly event link,
+    # e.g. "https://calendly.com/justin-boxio/30min". Leave empty to show a call button instead.
+    "sales_rep": {"name": "Justin", "calendly": "https://calendly.com/justin-boxioship/boxio-intro-call"},
     # Customer logos shown in the "Trusted by" strip (files in src/assets/logos/). Order = display order.
     "customers": [
-        ("Redmond", "redmond.svg"), ("Walli", "walli.png"), ("Mabē", "mabe.png"), ("AAPC", "aapc.png"),
+        ("Redmond", "redmond.svg"), ("Re-Lyte", "relyte.svg"), ("Walli", "walli.png"), ("Mabē", "mabe.png"), ("AAPC", "aapc.png"),
         ("Clean Monday Meals", "cleanmonday.png"), ("Ballerina Farm", "ballerinafarm.png"), ("Signal Relief", "signalrelief.png"),
-        ("Brixley Bags", "brixley.png"), ("Teddy + Rose", "teddyrose.png"), ("TEAMM8", "teamm8.png"), ("Super Patch", "superpatch.svg"),
+        ("Brixley Bags", "brixley.png"), ("Teddy + Rose", "teddyrose.png"), ("Real Salt", "realsalt.svg", "badge"), ("Super Patch", "superpatch.svg"),
         ("Kindly Camera Bags", "kindly.png"), ("Lates by Kate", "latesbykate.png"), ("Pressed Floral", "pressedfloral.svg"), ("Yonder", "yonder.png"),
     ],
-    "integrations": {
-        "store": ["Shopify", "WooCommerce", "BigCommerce", "Magento", "Squarespace", "Volusion", "QuickBooks Commerce"],
-        "market": ["Amazon", "Walmart", "eBay", "Etsy", "Wayfair", "Overstock", "Google Shopping"],
-        "shipping": ["ShipStation", "UPS", "FedEx", "USPS", "DHL", "FirstMile", "Asendia"],
-    },
 }
 
 # ---------------------------------------------------------------------------
@@ -83,27 +82,27 @@ PAGES = [
      "Ecommerce fulfillment in Utah from Boxio's Springville warehouse off I-15. Pick, pack & ship, storage, kitting and B2B for brands across Utah and the West. Free quote.",
      "Utah Fulfillment Center"),
     ("/florida-fulfillment-center/", "florida.html",
-     "Florida Fulfillment Center & 3PL | Boxio Ecommerce Fulfillment",
-     "Ecommerce fulfillment in Florida from Boxio. Reach Southeast and East Coast customers faster with pick, pack & ship, storage, kitting and retail distribution. Free quote.",
+     "Florida Fulfillment Center & 3PL in Jacksonville, FL | Boxio",
+     "Ecommerce fulfillment in Florida from Boxio's Jacksonville warehouse. Reach Southeast and East Coast customers faster with pick, pack & ship, storage, kitting and B2B. Free quote.",
      "Florida Fulfillment Center"),
     ("/services/", "services.html",
-     "Ecommerce Fulfillment Services | Pick, Pack, Ship & Storage | Boxio",
-     "Order fulfillment, warehousing, inventory management, kitting & bundling, B2B retail distribution, dropshipping and 2-day shipping from Utah and Florida.",
+     "3PL Fulfillment Services | Pick, Pack, Ship & Storage | Boxio",
+     "Full-service ecommerce 3PL: order fulfillment, warehousing, inventory management, kitting & bundling, B2B retail distribution, dropshipping and 2-day shipping from Utah and Florida.",
      "Services"),
     ("/integrations/", "integrations.html",
-     "Shopify, Amazon & Walmart Fulfillment Integrations | Boxio",
-     "Connect Shopify, WooCommerce, Amazon, Walmart, BigCommerce, Etsy, eBay and more to Boxio fulfillment. Ship with UPS, FedEx, USPS and DHL. Custom API available.",
+     "65+ Fulfillment Integrations: Shopify, Amazon, Walmart, TikTok Shop | Boxio",
+     "Connect Shopify, WooCommerce, BigCommerce, Amazon, Walmart, TikTok Shop, NetSuite, Loop and 60+ more to Boxio fulfillment. Ship with UPS, FedEx, USPS, DHL and more.",
      "Integrations"),
     ("/about/", "about.html",
      "About Boxio | Tech-Enabled 3PL in Utah & Florida",
      "Boxio is a tech-enabled third-party logistics company helping growing ecommerce brands ship faster from Utah and Florida with 99.99% order accuracy.",
      "About"),
     ("/request-a-quote/", "quote.html",
-     "Get a Free Fulfillment Quote | Boxio 3PL",
+     "Get a Free 3PL Fulfillment Quote | Boxio",
      "Tell us about your orders and get a free, custom ecommerce fulfillment quote from Boxio's Utah and Florida warehouses. Reply within one business day.",
      "Free Quote"),
     ("/contact/", "contact.html",
-     "Contact Boxio | Utah & Florida Fulfillment Centers",
+     "Contact Boxio 3PL | Utah & Florida Fulfillment Centers",
      "Contact Boxio fulfillment. Call, email or send a message to our Springville, Utah or Florida warehouse team.",
      "Contact"),
 ]
@@ -119,6 +118,8 @@ REDIRECTS = {
 # ---------------------------------------------------------------------------
 FAQS = {
     "home": [
+        ("What is a 3PL?",
+         "A 3PL (third-party logistics provider) stores your inventory and handles order fulfillment for you: receiving stock, picking and packing orders, and shipping them to your customers. Brands use a 3PL to ship faster and cut costs without running their own warehouse."),
         ("What does Boxio do?",
          "Boxio is a tech-enabled third-party logistics (3PL) company. We store your inventory and pick, pack and ship your ecommerce orders on your behalf, with real-time inventory tracking and integrations for the platforms you already sell on."),
         ("Where are Boxio's fulfillment centers?",
@@ -126,7 +127,9 @@ FAQS = {
         ("Should I ship from Utah, Florida, or both?",
          "Utah is well placed for customers in the West, Mountain West and Southwest. Florida is well placed for the Southeast and East Coast. Use the shipping map on this page to compare, or request a quote and we'll recommend a setup based on where your customers are."),
         ("Which ecommerce platforms do you integrate with?",
-         "Shopify, WooCommerce, BigCommerce, Magento, Squarespace, Amazon, Walmart, eBay, Etsy, Wayfair, Google Shopping, ShipStation and more. We also offer API integrations for custom builds."),
+         "Shopify, WooCommerce, BigCommerce, Amazon, Walmart, TikTok Shop, eBay, Etsy and Google Shopping, plus ERPs like Oracle NetSuite, returns platforms like Loop, and 60+ shipping carriers and apps. We also offer API integrations for custom builds."),
+        ("How quickly does your team respond?",
+         "Fast. Clients reach our team by chat, and our average chat response time is under 1 hour. You talk to real people who know your account, not a ticket queue."),
         ("How much does ecommerce fulfillment cost?",
          "Pricing depends on your monthly order volume, number of SKUs, storage needs and packaging. Request a free quote and we'll build pricing around your business."),
     ],
@@ -142,9 +145,9 @@ FAQS = {
     ],
     "florida": [
         ("Where is Boxio's Florida fulfillment center?",
-         "Our Florida warehouse is at {{fl_full}}."),
-        ("Why use a Florida 3PL?",
-         "Florida puts your inventory close to the fast-growing Southeast and within ground reach of the East Coast. Florida's major ports and airports also make it a natural gateway for international orders."),
+         "Our Florida warehouse is at {{fl_full}}, in Northeast Florida."),
+        ("Why use a Jacksonville, Florida 3PL?",
+         "Jacksonville sits at the junction of I-95 and I-10, putting your inventory close to the fast-growing Southeast and within ground reach of the entire East Coast. JAXPORT and Florida's major airports also make it a natural gateway for international orders."),
         ("Can I use both the Utah and Florida warehouses?",
          "Yes. Pairing Utah with Florida puts inventory on both sides of the country, which can shorten transit times for customers coast to coast. We'll help you decide what makes sense for your volume."),
         ("What services are available at the Florida warehouse?",
@@ -176,9 +179,9 @@ ICONS = {
     "chat": f'<svg {_s}><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-6.4A8 8 0 1121 12z"/></svg>',
 }
 
-LOGO = ('<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#fe4608"/>'
-        '<path d="M20 9l10 5.5v11L20 31l-10-5.5v-11L20 9z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>'
-        '<path d="M10 14.5L20 20l10-5.5M20 20v11" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></svg>')
+# Brand logo (src/assets/brand/). Source: Boxio logo, brand color #29254F.
+LOGO = '<img src="/assets/brand/logo.png" alt="Boxio" width="126" height="32">'
+LOGO_WHITE = '<img src="/assets/brand/logo-white.png" alt="Boxio" width="134" height="34">'
 
 
 # ---------------------------------------------------------------------------
@@ -247,15 +250,47 @@ def logo_size(path, area=4600, max_h=46, max_w=215):
 
 
 def customer_logos_html():
-    def li(n, f):
+    def li(n, f, mode=""):
+        # "badge" logos have knocked-out lettering, so they're shown in grayscale instead of as a silhouette
         w, h = logo_size(SRC / "assets" / "logos" / f)
-        return f'<li><img src="/assets/logos/{f}" alt="{escape(n)}" width="{w}" height="{h}" loading="lazy" decoding="async"></li>'
-    items = "".join(li(n, f) for n, f in CONFIG["customers"])
+        cls = f' class="{mode}"' if mode else ""
+        return f'<li><img src="/assets/logos/{f}" alt="{escape(n)}" width="{w}" height="{h}"{cls} loading="lazy" decoding="async"></li>'
+    items = "".join(li(*c) for c in CONFIG["customers"])
     dup = items.replace('alt="', 'aria-hidden="true" alt="')
     return f"""<section class="logos" aria-label="Brands that ship with Boxio">
-  <div class="container"><p class="logos-title">Trusted by growing brands across the U.S.</p></div>
+  <div class="container"><p class="logos-title">Trusted by 100+ growing brands</p></div>
   <div class="logo-marquee"><ul class="logo-track">{items}{dup}</ul></div>
 </section>"""
+
+INT_LABELS = {"store": "Ecommerce platform", "market": "Marketplace", "shipping": "Shipping carrier",
+              "erp": "ERP", "returns": "Returns", "apps": "Apps & partners"}
+
+
+def integrations():
+    return json.loads((SRC / "data" / "integrations.json").read_text())
+
+
+def integrations_grid_html():
+    cards = "".join(
+        f'<div class="int" data-cat="{i["category"]}" data-name="{escape(i["name"])}">'
+        f'<span class="int-logo"><img src="/assets/integrations/{i["logo"]}" alt="{escape(i["name"])} logo" loading="lazy" decoding="async"></span>'
+        f'<strong>{escape(i["name"])}</strong><small>{INT_LABELS[i["category"]]}</small></div>'
+        for i in integrations()
+    )
+    cards += ('<div class="int" data-cat="apps" data-name="Custom API integration"><span class="int-logo int-logo-api">{}</span>'
+              '<strong>Custom API</strong><small>For custom builds</small></div>')
+    return cards
+
+def booking_html():
+    rep = CONFIG["sales_rep"]
+    url = rep["calendly"].strip()
+    if not url:
+        return (f'<a class="btn btn-light" href="tel:{{{{ut_tel}}}}" style="width:100%">{{{{icon:phone}}}} Call {escape(rep["name"])}: {{{{ut_phone}}}}</a>')
+    sep = "&" if "?" in url else "?"
+    full = url + sep + "hide_gdpr_banner=1&hide_event_type_details=1&primary_color=29254f&text_color=0f0d1f"
+    return (f'<div class="calendly-box" data-calendly="{escape(full)}">'
+            f'<p class="calendly-loading">Loading {escape(rep["name"])}\'s calendar…</p>'
+            f'<noscript><a href="{escape(url)}">Book a call with {escape(rep["name"])}</a></noscript></div>')
 
 def faq_html(key):
     items = "".join(
@@ -285,7 +320,7 @@ def local_business(key):
         "url": url,
         "email": CONFIG["email"],
         "telephone": TOKENS[f"{key}_tel"] or None,
-        "image": CONFIG["site_url"] + "/assets/logo.svg",
+        "image": CONFIG["site_url"] + "/assets/brand/logo-large.png",
         "priceRange": "$$",
         "address": {
             "@type": "PostalAddress",
@@ -310,7 +345,7 @@ def organization():
         "name": CONFIG["brand"],
         "legalName": CONFIG["legal_name"],
         "url": CONFIG["site_url"] + "/",
-        "logo": CONFIG["site_url"] + "/assets/logo.svg",
+        "logo": CONFIG["site_url"] + "/assets/brand/logo-large.png",
         "email": CONFIG["email"],
         "telephone": TOKENS["ut_tel"],
         "description": "Tech-enabled third-party logistics (3PL) and ecommerce fulfillment with warehouses in Utah and Florida.",
@@ -358,7 +393,7 @@ def header(path):
     return f"""<a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container header-inner">
-    <a class="logo" href="/" aria-label="Boxio home">{LOGO}<span>boxio</span></a>
+    <a class="logo" href="/" aria-label="Boxio home">{LOGO}</a>
     <nav class="nav" aria-label="Main">
       <a href="/services/"{cur('/services/')}>Services</a>
       <div class="dd">
@@ -387,33 +422,33 @@ def footer():
   <div class="container">
     <div class="foot-grid">
       <div>
-        <a class="logo" href="/">{LOGO}<span>boxio</span></a>
-        <p>Tech-enabled ecommerce fulfillment from Utah and Florida. We ship orders fast, so you can grow faster.</p>
+        <a class="logo" href="/" aria-label="Boxio home">{LOGO_WHITE}</a>
+        <p>Boxio is a tech-enabled ecommerce 3PL (third-party logistics) company with fulfillment centers in Springville, Utah and Jacksonville, Florida. We ship orders fast, so you can grow faster.</p>
         <p><a href="mailto:{{{{email}}}}">{{{{email}}}}</a></p>
       </div>
       <div>
-        <h4>Utah Fulfillment Center</h4>
+        <h4>Utah 3PL Fulfillment Center</h4>
         <address>{{{{ut_street}}}}<br>{{{{ut_city}}}}, {{{{ut_state}}}} {{{{ut_zip}}}}<br><a href="tel:{{{{ut_tel}}}}">{{{{ut_phone}}}}</a></address>
         <p><a href="{{{{ut_path}}}}">Utah 3PL &amp; fulfillment →</a></p>
       </div>
       <div>
-        <h4>Florida Fulfillment Center</h4>
+        <h4>Florida 3PL Fulfillment Center</h4>
         <address>{{{{fl_street}}}}<br>{{{{fl_city}}}}, {{{{fl_state}}}} {{{{fl_zip}}}}<br><a href="tel:{{{{fl_tel}}}}">{{{{fl_phone}}}}</a></address>
         <p><a href="{{{{fl_path}}}}">Florida 3PL &amp; fulfillment →</a></p>
       </div>
       <div>
         <h4>Company</h4>
         <ul>
-          <li><a href="/services/">Fulfillment services</a></li>
+          <li><a href="/services/">3PL fulfillment services</a></li>
           <li><a href="/integrations/">Integrations</a></li>
           <li><a href="/about/">About Boxio</a></li>
-          <li><a href="/request-a-quote/">Get a free quote</a></li>
+          <li><a href="/request-a-quote/">Get a free 3PL quote</a></li>
           <li><a href="/contact/">Contact us</a></li>
         </ul>
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© {{{{year}}}} {CONFIG['legal_name']}. All rights reserved.</span>
+      <span>© {{{{year}}}} {CONFIG['legal_name']}. Ecommerce 3PL &amp; order fulfillment in Utah and Florida.</span>
       <span><a href="/privacy/">Privacy Policy</a> · <a href="/terms/">Terms &amp; Conditions</a></span>
     </div>
   </div>
@@ -436,7 +471,7 @@ def render(path, src_name, title, desc, crumb):
     crumbs = ""
     if crumb:
         crumbs = f'<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">{escape(crumb)}</li></ol></nav>'
-    body = body.replace("{{crumbs}}", crumbs).replace("{{customer_logos}}", customer_logos_html())
+    body = body.replace("{{crumbs}}", crumbs).replace("{{customer_logos}}", customer_logos_html()).replace("{{integrations_grid}}", integrations_grid_html()).replace("{{integrations_count}}", str(len(integrations()))).replace("{{booking}}", booking_html()).replace("{{sales_rep}}", escape(CONFIG["sales_rep"]["name"]))
     canonical = CONFIG["site_url"] + path
     geo = ""
     if path == "/utah-fulfillment-center/":
@@ -459,8 +494,10 @@ def render(path, src_name, title, desc, crumb):
 <meta property="og:url" content="{canonical}">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#141413">
-<link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+<meta name="theme-color" content="#29254f">
+<link rel="icon" href="/assets/brand/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/brand/icon.png">
+<meta property="og:image" content="{CONFIG['site_url']}/assets/brand/logo-large.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap">
@@ -487,7 +524,6 @@ def main():
         shutil.rmtree(DIST)
     (DIST / "assets").mkdir(parents=True)
     shutil.copytree(SRC / "assets", DIST / "assets", dirs_exist_ok=True)
-    (DIST / "assets" / "logo.svg").write_text(LOGO.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" '))
 
     for path, src_name, title, desc, crumb in PAGES:
         out = DIST / path.strip("/") / "index.html" if path != "/" else DIST / "index.html"
@@ -513,6 +549,8 @@ def main():
     print(f"Built {len(PAGES) + 1} pages into {DIST.relative_to(ROOT)}/")
     if todos:
         print("  ! Placeholders still present:", ", ".join(sorted(todos)), "— update CONFIG['locations']['fl'] in build.py")
+    if not CONFIG["sales_rep"]["calendly"]:
+        print("  ! No Calendly link yet — set CONFIG['sales_rep']['calendly'] in build.py (showing a call button for now)")
     if missing:
         print("  ! Footer links to /privacy/ and /terms/ — add src/pages/privacy.html and terms.html (copy from the current site) and list them in PAGES")
 

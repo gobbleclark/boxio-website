@@ -1,0 +1,327 @@
+[
+ {
+  "name": "6 River System",
+  "category": "apps",
+  "logo": "6-river-system.webp"
+ },
+ {
+  "name": "99Minutos (eShip)",
+  "category": "shipping",
+  "logo": "99minutos-eship.webp"
+ },
+ {
+  "name": "Amazon",
+  "category": "market",
+  "logo": "amazon.webp"
+ },
+ {
+  "name": "Amazon Shipping",
+  "category": "shipping",
+  "logo": "amazon-shipping.webp"
+ },
+ {
+  "name": "APC",
+  "category": "shipping",
+  "logo": "apc.webp"
+ },
+ {
+  "name": "APIWorx",
+  "category": "apps",
+  "logo": "apiworx.webp"
+ },
+ {
+  "name": "Asendia",
+  "category": "shipping",
+  "logo": "asendia.webp"
+ },
+ {
+  "name": "Australia Post",
+  "category": "shipping",
+  "logo": "australia-post.webp"
+ },
+ {
+  "name": "Better Trucks",
+  "category": "shipping",
+  "logo": "better-trucks.webp"
+ },
+ {
+  "name": "BigCommerce",
+  "category": "store",
+  "logo": "bigcommerce.webp"
+ },
+ {
+  "name": "Brightpearl",
+  "category": "apps",
+  "logo": "brightpearl.webp"
+ },
+ {
+  "name": "Bring",
+  "category": "shipping",
+  "logo": "bring.webp"
+ },
+ {
+  "name": "Canada Post",
+  "category": "shipping",
+  "logo": "canada-post.webp"
+ },
+ {
+  "name": "ChannelAdvisor",
+  "category": "apps",
+  "logo": "channeladvisor.webp"
+ },
+ {
+  "name": "ConstaCloud",
+  "category": "apps",
+  "logo": "constacloud.webp"
+ },
+ {
+  "name": "CouriersPlease",
+  "category": "shipping",
+  "logo": "couriersplease.webp"
+ },
+ {
+  "name": "DashLink",
+  "category": "shipping",
+  "logo": "dashlink.avif"
+ },
+ {
+  "name": "Deutsche Post",
+  "category": "shipping",
+  "logo": "deutsche-post.webp"
+ },
+ {
+  "name": "DHL eCommerce",
+  "category": "shipping",
+  "logo": "dhl-ecommerce.webp"
+ },
+ {
+  "name": "DHL Express",
+  "category": "shipping",
+  "logo": "dhl-express.webp"
+ },
+ {
+  "name": "DPD",
+  "category": "shipping",
+  "logo": "dpd.webp"
+ },
+ {
+  "name": "eBay",
+  "category": "market",
+  "logo": "ebay.webp"
+ },
+ {
+  "name": "eShip",
+  "category": "shipping",
+  "logo": "eship.webp"
+ },
+ {
+  "name": "Estafeta (eShip)",
+  "category": "shipping",
+  "logo": "estafeta-eship.webp"
+ },
+ {
+  "name": "Etsy",
+  "category": "market",
+  "logo": "etsy.webp"
+ },
+ {
+  "name": "FedEx",
+  "category": "shipping",
+  "logo": "fedex.webp"
+ },
+ {
+  "name": "FedEx Cross Border",
+  "category": "shipping",
+  "logo": "fedex-cross-border.webp"
+ },
+ {
+  "name": "FlavorCloud",
+  "category": "shipping",
+  "logo": "flavorcloud.svg"
+ },
+ {
+  "name": "Flxpoint",
+  "category": "apps",
+  "logo": "flxpoint.webp"
+ },
+ {
+  "name": "Global-e",
+  "category": "shipping",
+  "logo": "global-e.webp"
+ },
+ {
+  "name": "Globegistics",
+  "category": "shipping",
+  "logo": "globegistics.webp"
+ },
+ {
+  "name": "GLS US",
+  "category": "shipping",
+  "logo": "gls-us.webp"
+ },
+ {
+  "name": "GOFO",
+  "category": "shipping",
+  "logo": "gofo.avif"
+ },
+ {
+  "name": "GoodDay Software",
+  "category": "erp",
+  "logo": "goodday-software.webp"
+ },
+ {
+  "name": "Google Shopping",
+  "category": "market",
+  "logo": "google-shopping.webp"
+ },
+ {
+  "name": "Hermes",
+  "category": "shipping",
+  "logo": "hermes.webp"
+ },
+ {
+  "name": "Interlink Express",
+  "category": "shipping",
+  "logo": "interlink-express.webp"
+ },
+ {
+  "name": "International Bridge",
+  "category": "shipping",
+  "logo": "international-bridge.avif"
+ },
+ {
+  "name": "Inventory Planner",
+  "category": "apps",
+  "logo": "inventory-planner.webp"
+ },
+ {
+  "name": "Klaviyo",
+  "category": "apps",
+  "logo": "klaviyo.webp"
+ },
+ {
+  "name": "Loop",
+  "category": "returns",
+  "logo": "loop.webp"
+ },
+ {
+  "name": "Make",
+  "category": "apps",
+  "logo": "make.webp"
+ },
+ {
+  "name": "Nulogy",
+  "category": "apps",
+  "logo": "nulogy.webp"
+ },
+ {
+  "name": "NZ Post",
+  "category": "shipping",
+  "logo": "nz-post.webp"
+ },
+ {
+  "name": "OnTrac",
+  "category": "shipping",
+  "logo": "ontrac.avif"
+ },
+ {
+  "name": "Oracle NetSuite",
+  "category": "erp",
+  "logo": "oracle-netsuite.webp"
+ },
+ {
+  "name": "Order Desk",
+  "category": "apps",
+  "logo": "order-desk.webp"
+ },
+ {
+  "name": "Passport",
+  "category": "shipping",
+  "logo": "passport.webp"
+ },
+ {
+  "name": "Pipe17",
+  "category": "apps",
+  "logo": "pipe17.webp"
+ },
+ {
+  "name": "Purolator",
+  "category": "shipping",
+  "logo": "purolator.webp"
+ },
+ {
+  "name": "Segmail (eShip)",
+  "category": "shipping",
+  "logo": "segmail-eship.webp"
+ },
+ {
+  "name": "Sendcloud",
+  "category": "shipping",
+  "logo": "sendcloud.webp"
+ },
+ {
+  "name": "ShipX",
+  "category": "shipping",
+  "logo": "shipx.webp"
+ },
+ {
+  "name": "Shopify",
+  "category": "store",
+  "logo": "shopify.webp"
+ },
+ {
+  "name": "SPS Commerce",
+  "category": "apps",
+  "logo": "sps-commerce.webp"
+ },
+ {
+  "name": "StarTrack",
+  "category": "shipping",
+  "logo": "startrack.webp"
+ },
+ {
+  "name": "TikTok Shop",
+  "category": "market",
+  "logo": "tiktok-shop.webp"
+ },
+ {
+  "name": "UniUni",
+  "category": "shipping",
+  "logo": "uniuni.webp"
+ },
+ {
+  "name": "UPS",
+  "category": "shipping",
+  "logo": "ups.webp"
+ },
+ {
+  "name": "USPS",
+  "category": "shipping",
+  "logo": "usps.webp"
+ },
+ {
+  "name": "Veho",
+  "category": "shipping",
+  "logo": "veho.webp"
+ },
+ {
+  "name": "Walmart",
+  "category": "market",
+  "logo": "walmart.webp"
+ },
+ {
+  "name": "WebShipper",
+  "category": "shipping",
+  "logo": "webshipper.webp"
+ },
+ {
+  "name": "WooCommerce",
+  "category": "store",
+  "logo": "woocommerce.webp"
+ },
+ {
+  "name": "Zonos",
+  "category": "shipping",
+  "logo": "zonos.webp"
+ }
+]

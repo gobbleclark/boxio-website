@@ -8,7 +8,7 @@
     </div>
 
     <div class="form-shell">
-      <form class="form-card reveal" data-simple-form data-subject="Website contact form" novalidate>
+      <form class="form-card reveal" data-simple-form data-form-type="contact" novalidate>
         <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="row-2">
           <div class="field"><label for="c-name">Name</label><input id="c-name" name="Name" required autocomplete="name"><span class="err">Please enter your name.</span></div>
@@ -37,6 +37,7 @@
 
       <aside class="aside-card reveal">
         <h3>Reach us directly</h3>
+        <div class="contact-line">{{icon:chat}}<div><strong>Already a client?</strong><br>Chat with our team for the fastest help. Our average chat response time is under 1 hour.</div></div>
         <div class="contact-line">{{icon:mail}}<div><strong>Email</strong><br><a href="mailto:{{email}}">{{email}}</a></div></div>
         <div class="contact-line">{{icon:pin}}<div><strong>Utah Fulfillment Center</strong><br>{{ut_street}}<br>{{ut_city}}, {{ut_state}} {{ut_zip}}<br><a href="tel:{{ut_tel}}">{{ut_phone}}</a></div></div>
         <div class="contact-line">{{icon:pin}}<div><strong>Florida Fulfillment Center</strong><br>{{fl_street}}<br>{{fl_city}}, {{fl_state}} {{fl_zip}}<br><a href="tel:{{fl_tel}}">{{fl_phone}}</a></div></div>

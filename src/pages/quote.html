@@ -3,11 +3,11 @@
     {{crumbs}}
     <div class="section-head reveal" style="margin-bottom:40px">
       <span class="eyebrow">Free quote · No obligation</span>
-      <h1>Get a free fulfillment quote</h1>
+      <h1>Get a free 3PL fulfillment quote</h1>
       <p class="lede">Answer a few quick questions and we'll send custom pricing for our Utah and Florida warehouses within one business day.</p>
     </div>
 
-    <div class="form-shell">
+    <div class="form-shell form-shell-booking">
       <form class="form-card reveal" data-wizard novalidate>
         <div class="progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <span class="step-label" aria-live="polite">Step 1 of 4</span>
@@ -92,13 +92,10 @@
         </div>
       </form>
 
-      <aside class="aside-card reveal">
+      <aside class="aside-card booking reveal">
         <h3>Prefer to talk?</h3>
-        <p>Our team is happy to walk through your fulfillment needs.</p>
-        <div class="contact-line">{{icon:phone}}<div><strong>Utah</strong><br><a href="tel:{{ut_tel}}">{{ut_phone}}</a></div></div>
-        <div class="contact-line">{{icon:phone}}<div><strong>Florida</strong><br><a href="tel:{{fl_tel}}">{{fl_phone}}</a></div></div>
-        <div class="contact-line">{{icon:mail}}<div><strong>Email</strong><br><a href="mailto:{{email}}">{{email}}</a></div></div>
-        <div class="contact-line">{{icon:shield}}<div>No obligation, no long sales cycle. Just a clear quote.</div></div>
+        <p>Talk with {{sales_rep}} from our sales team. We'll walk through your fulfillment needs and answer any questions.</p>
+        {{booking}}
       </aside>
     </div>
   </div>
