@@ -571,3 +571,7 @@ fieldset { min-width: 0; }
 .legal h3 { font-size: 1.15rem; margin-top: 1.6em; }
 .legal h4 { font-size: 1rem; margin-top: 1.4em; }
 .legal p, .legal li { color: var(--ink-2); overflow-wrap: anywhere; }
+.site-footer .social { display: flex; gap: 10px; margin-top: 4px; }
+.site-footer .social a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, .08); color: #fff; padding: 0; transition: background .2s; }
+.site-footer .social a:hover { background: var(--accent-bright); text-decoration: none; }
+.site-footer .social svg { width: 18px; height: 18px; }
