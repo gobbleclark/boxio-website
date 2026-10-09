@@ -593,3 +593,39 @@ fieldset { min-width: 0; }
   .hero-actions { margin: 24px 0 32px; }
   .hero-actions .btn-primary { width: 100%; }
 }
+
+/* ---------- Guides (long-form articles) ---------- */
+.article-meta { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+.article-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 56px; align-items: start; }
+@media (max-width: 960px) { .article-layout { grid-template-columns: minmax(0, 1fr); } .article-aside { order: -1; } }
+.article { font-size: 1.07rem; max-width: 720px; }
+.article h2 { font-size: clamp(1.45rem, 2.6vw, 1.85rem); margin: 2.2em 0 .6em; scroll-margin-top: 96px; }
+.article h3 { font-size: 1.2rem; margin: 1.6em 0 .5em; }
+.article p, .article li { color: var(--ink-2); }
+.article ul, .article ol { padding-left: 1.3em; margin: 0 0 1.2em; }
+.article li { margin-bottom: .5em; }
+.article a { color: var(--accent-dark); text-underline-offset: 3px; }
+.article .callout { background: var(--accent-soft); border-left: 4px solid var(--accent-bright); border-radius: 0 12px 12px 0; padding: 18px 22px; margin: 1.6em 0; }
+.article .callout p { margin: 0; color: var(--ink); }
+.article table { width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: .97rem; display: block; overflow-x: auto; }
+.article th, .article td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.article th { font-family: var(--font-head); background: var(--sand); color: var(--ink); }
+.article .inline-cta { background: var(--navy); color: var(--on-dark); border-radius: 18px; padding: 28px; margin: 2em 0; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+.article .inline-cta p { margin: 0; color: var(--on-dark); font: 700 1.15rem var(--font-head); }
+.article .inline-cta .btn { color: var(--ink); }
+.article-aside { position: sticky; top: 96px; display: grid; gap: 16px; }
+@media (max-width: 960px) { .article-aside { position: static; } }
+.toc { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+.toc strong { display: block; font: 700 .8rem var(--font-head); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 10px; }
+.toc ol { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; font-size: .95rem; }
+.toc a { text-decoration: none; color: var(--ink-2); }
+.toc a:hover { color: var(--accent-dark); }
+.aside-cta { background: var(--navy); color: var(--on-dark-2); border-radius: 16px; padding: 22px; }
+.aside-cta h3 { color: #fff; font-size: 1.1rem; margin-bottom: 6px; }
+.aside-cta p { font-size: .95rem; margin-bottom: 14px; }
+.aside-cta .btn { width: 100%; }
+.guide-cards .card h3 { font-size: 1.1rem; }
+a.int-link { text-decoration: none; color: inherit; border-color: var(--accent-bright); }
+a.int-link .more { margin-top: auto; font-size: .85rem; }
+.article-layout > * { min-width: 0; }
+.article table { max-width: 100%; }

@@ -135,7 +135,31 @@ PAGES = [
      "TikTok Shop Fulfillment | Utah & Florida 3PL | Boxio",
      "TikTok Shop fulfillment built for viral spikes. Orders sync automatically and ship fast from Utah and Florida, including creator samples. Get a free quote.",
      "TikTok Shop Fulfillment"),
+    ("/what-is-a-3pl/", "what-is-a-3pl.html",
+     "What Is a 3PL? Ecommerce Fulfillment Explained | Boxio",
+     "What a 3PL (third-party logistics provider) does, how 3PL fulfillment works, when your brand needs one and how to choose the right partner.",
+     "What Is a 3PL?"),
+    ("/3pl-pricing/", "3pl-pricing.html",
+     "3PL Pricing Explained: What Fulfillment Really Costs | Boxio",
+     "How 3PL pricing works: receiving, storage, pick and pack, packaging and shipping fees, what drives your cost, and how to compare 3PL quotes.",
+     "3PL Pricing"),
+    ("/3pl-vs-in-house-fulfillment/", "3pl-vs-in-house.html",
+     "3PL vs. In-House Fulfillment: When to Outsource | Boxio",
+     "Compare a 3PL with shipping orders yourself: cost, speed, shipping rates and scale. Signs it's time to outsource and how to switch smoothly.",
+     "3PL vs. In-House Fulfillment"),
+    ("/b2b-fulfillment/", "b2b.html",
+     "B2B & Wholesale Fulfillment | Utah & Florida 3PL | Boxio",
+     "B2B, wholesale and retail fulfillment from Utah and Florida. Ship retailer orders and D2C orders from one inventory with 99.99% accuracy. Free quote.",
+     "B2B Fulfillment"),
 ]
+
+# Long-form guides get Article schema
+ARTICLE_PAGES = {
+    "/what-is-a-3pl/": "What Is a 3PL? Ecommerce Fulfillment Explained",
+    "/3pl-pricing/": "3PL Pricing Explained: What Fulfillment Really Costs",
+    "/3pl-vs-in-house-fulfillment/": "3PL vs. In-House Fulfillment: When to Outsource",
+}
+ARTICLE_DATE = "2026-10-09"
 
 # Sales-channel pages: path -> (channel name used in the quote form, schema service name)
 CHANNEL_PAGES = {
@@ -220,6 +244,46 @@ FAQS = {
          "Yes. Creator and affiliate sample orders ship just like customer orders, so you can get product into creators' hands quickly."),
         ("How do TikTok Shop orders get to customers faster?",
          "Ship from the warehouse closest to each customer: Springville, Utah for the West and Jacksonville, Florida for the Southeast and East Coast."),
+    ],
+    "whatis": [
+        ("What does 3PL stand for?",
+         "3PL stands for third-party logistics. A 3PL is a company that stores your inventory and handles order fulfillment for you, from receiving stock to picking, packing and shipping orders."),
+        ("What's the difference between a 3PL and a fulfillment center?",
+         "A fulfillment center is the warehouse where orders are packed and shipped. A 3PL is the company that runs fulfillment for you, often across one or more fulfillment centers, along with the technology, integrations and carrier relationships behind it."),
+        ("Is a 3PL the same as Amazon FBA?",
+         "No. FBA only fulfills Amazon orders from Amazon's warehouses. A 3PL fulfills orders from every channel you sell on, including your own website, marketplaces and B2B, and can also prep and send inventory into FBA."),
+        ("How do I know if my business needs a 3PL?",
+         "Common signs: packing orders takes over your week, you've run out of space, shipping mistakes are creeping in, you're adding sales channels or wholesale accounts, or customers on the other side of the country wait too long for deliveries."),
+    ],
+    "pricing": [
+        ("How much does a 3PL cost?",
+         "It depends on your order volume, items per order, product size, storage needs and where your customers are. Most 3PL pricing combines receiving, storage, pick and pack, packaging and shipping fees. The most reliable way to know is a custom quote based on your real order data."),
+        ("Is shipping included in 3PL pricing?",
+         "Usually postage is billed separately from fulfillment fees, based on the carrier, service level, package weight and dimensions, and destination zone. Ask every 3PL how they bill postage so you can compare quotes fairly."),
+        ("Why do 3PL quotes vary so much?",
+         "3PLs bundle fees differently: some charge per order, some per item, some include packaging and some don't. Compare the total cost per order for your typical order, not individual line items."),
+        ("How can a 3PL lower my shipping costs?",
+         "Carrier discounts and smarter packaging help, but warehouse location matters most. Shipping from a warehouse closer to your customers means fewer shipping zones per package, which lowers postage and speeds up delivery."),
+    ],
+    "vsinhouse": [
+        ("When should I switch from in-house fulfillment to a 3PL?",
+         "When fulfillment starts limiting growth: packing orders eats up your time, you're out of space, errors or delays are increasing, or you're adding channels like Amazon, TikTok Shop or wholesale that are hard to manage from one garage or small warehouse."),
+        ("Is a 3PL cheaper than doing fulfillment myself?",
+         "Often, once you count everything: rent, staff, packaging, software and the shipping discounts a 3PL gets from volume. In-house can be cheaper at very low volumes, but it usually costs more of your time."),
+        ("Will I lose control if I outsource fulfillment?",
+         "Not with the right 3PL. You should see live inventory and order status, set your own packaging rules and reach a real person quickly. Boxio clients get real-time inventory and an average chat response time under 1 hour."),
+        ("How hard is it to switch to a 3PL?",
+         "The main steps are connecting your store, setting up your products and sending in inventory. A good 3PL handles onboarding with you so orders keep shipping during the move."),
+    ],
+    "b2b": [
+        ("What is B2B fulfillment?",
+         "B2B fulfillment is shipping orders to other businesses, such as retailers, wholesalers and distributors, instead of to individual consumers. These orders are often larger and come with retailer-specific packing, labeling and paperwork requirements."),
+        ("Can you ship B2B and D2C orders from the same inventory?",
+         "Yes. Your wholesale and retail orders ship from the same inventory as your D2C orders, so stock levels stay accurate across every channel."),
+        ("Do you support retail dropshipping?",
+         "Yes. We fulfill dropship orders on behalf of your retail partners, shipping directly to their customers."),
+        ("Can you handle EDI orders?",
+         "Boxio connects with SPS Commerce for EDI, which many retailers require. Tell us which retailers you sell to and we'll confirm the setup."),
     ],
     "florida": [
         ("Where is Boxio's Florida fulfillment center?",
@@ -348,13 +412,26 @@ def integrations():
     return json.loads((SRC / "data" / "integrations.json").read_text())
 
 
+# Integrations that have their own page on the site (internal links help those pages rank)
+INT_PAGES = {
+    "Shopify": ("/shopify-fulfillment/", "Shopify fulfillment"),
+    "Amazon": ("/amazon-fulfillment/", "Amazon FBA prep & FBM"),
+    "Walmart": ("/walmart-fulfillment/", "Walmart fulfillment"),
+    "TikTok Shop": ("/tiktok-shop-fulfillment/", "TikTok Shop fulfillment"),
+    "SPS Commerce": ("/b2b-fulfillment/", "B2B & EDI fulfillment"),
+}
+
+
 def integrations_grid_html():
-    cards = "".join(
-        f'<div class="int" data-cat="{i["category"]}" data-name="{escape(i["name"])}">'
-        f'<span class="int-logo"><img src="/assets/integrations/{i["logo"]}" alt="{escape(i["name"])} logo" loading="lazy" decoding="async"></span>'
-        f'<strong>{escape(i["name"])}</strong><small>{INT_LABELS[i["category"]]}</small></div>'
-        for i in integrations()
-    )
+    def card(i):
+        inner = (f'<span class="int-logo"><img src="/assets/integrations/{i["logo"]}" alt="{escape(i["name"])} logo" loading="lazy" decoding="async"></span>'
+                 f'<strong>{escape(i["name"])}</strong><small>{INT_LABELS[i["category"]]}</small>')
+        attrs = f'data-cat="{i["category"]}" data-name="{escape(i["name"])}"'
+        if i["name"] in INT_PAGES:
+            href, label = INT_PAGES[i["name"]]
+            return f'<a class="int int-link" href="{href}" {attrs}>{inner}<span class="more">{escape(label)} <span>→</span></span></a>'
+        return f'<div class="int" {attrs}>{inner}</div>'
+    cards = "".join(card(i) for i in integrations())
     cards += ('<div class="int" data-cat="apps" data-name="Custom API integration"><span class="int-logo int-logo-api">{}</span>'
               '<strong>Custom API</strong><small>For custom builds</small></div>')
     return cards
@@ -453,6 +530,17 @@ def schema_for(path, label, body_src):
         graph.append(local_business("ut"))
     if path == "/florida-fulfillment-center/":
         graph.append(local_business("fl"))
+    if path in ARTICLE_PAGES:
+        graph.append({"@type": "Article", "headline": ARTICLE_PAGES[path],
+                      "datePublished": ARTICLE_DATE, "dateModified": ARTICLE_DATE,
+                      "author": {"@id": CONFIG["site_url"] + "/#organization"},
+                      "publisher": {"@id": CONFIG["site_url"] + "/#organization"},
+                      "image": CONFIG["site_url"] + "/assets/brand/logo-large.png",
+                      "mainEntityOfPage": CONFIG["site_url"] + path})
+    if path == "/b2b-fulfillment/":
+        graph.append({"@type": "Service", "name": "B2B and wholesale fulfillment", "serviceType": "B2B fulfillment",
+                      "provider": {"@id": CONFIG["site_url"] + "/#organization"},
+                      "areaServed": {"@type": "Country", "name": "United States"}, "url": CONFIG["site_url"] + path})
     if path in CHANNEL_PAGES:
         name = CHANNEL_PAGES[path][1]
         graph.append({"@type": "Service", "name": name, "serviceType": name,
@@ -488,6 +576,7 @@ def header(path):
           <a href="/amazon-fulfillment/"><span class="pin">AMZ</span><span><strong>Amazon FBA prep &amp; FBM</strong><span>Prep, replenishment &amp; order fulfillment</span></span></a>
           <a href="/walmart-fulfillment/"><span class="pin">WMT</span><span><strong>Walmart fulfillment</strong><span>On-time shipping for Marketplace sellers</span></span></a>
           <a href="/tiktok-shop-fulfillment/"><span class="pin">TT</span><span><strong>TikTok Shop fulfillment</strong><span>Built for viral spikes &amp; creator samples</span></span></a>
+          <a href="/b2b-fulfillment/"><span class="pin">B2B</span><span><strong>B2B &amp; wholesale fulfillment</strong><span>Retail, wholesale &amp; dropship orders</span></span></a>
         </div>
       </div>
       <div class="dd">
@@ -552,6 +641,10 @@ def footer():
           <li><a href="/amazon-fulfillment/">Amazon FBA prep &amp; FBM</a></li>
           <li><a href="/walmart-fulfillment/">Walmart fulfillment</a></li>
           <li><a href="/tiktok-shop-fulfillment/">TikTok Shop fulfillment</a></li>
+          <li><a href="/b2b-fulfillment/">B2B &amp; wholesale fulfillment</a></li>
+          <li><a href="/what-is-a-3pl/">What is a 3PL?</a></li>
+          <li><a href="/3pl-pricing/">3PL pricing explained</a></li>
+          <li><a href="/3pl-vs-in-house-fulfillment/">3PL vs. in-house</a></li>
           <li><a href="/integrations/">Integrations</a></li>
           <li><a href="/about/">About Boxio</a></li>
           <li><a href="/request-a-quote/">Get a free 3PL quote</a></li>
