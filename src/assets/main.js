@@ -16,10 +16,13 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 /* ---------- Header: scrolled state, mobile menu, dropdowns ---------- */
 const header = $(".site-header");
 const fab = $(".fab");
+const mobileBar = $(".mobile-bar");
 const onScroll = () => {
   const y = window.scrollY;
   header && header.classList.toggle("scrolled", y > 8);
   fab && fab.classList.toggle("show", y > 600);
+  // Phones: keep the first screen to a single call-to-action; the sticky bar appears once you scroll past the hero
+  mobileBar && mobileBar.classList.toggle("show", y > 480);
 };
 window.addEventListener("scroll", onScroll, { passive: true });
 onScroll();

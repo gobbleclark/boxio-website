@@ -584,3 +584,12 @@ fieldset { min-width: 0; }
 .channel-hero-logo img { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; }
 .steps-grid .card .n { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font: 800 .95rem var(--font-head); margin-bottom: 14px; }
 @media (max-width: 420px) { .btn { white-space: normal; text-align: center; line-height: 1.25; } }
+
+/* Phones: one call-to-action on first load */
+@media (max-width: 640px) {
+  .mobile-bar { transform: translateY(110%); transition: transform .3s ease; }
+  .mobile-bar.show { transform: none; }
+  .hero-actions .btn-ghost { display: none; }
+  .hero-actions { margin: 24px 0 32px; }
+  .hero-actions .btn-primary { width: 100%; }
+}
