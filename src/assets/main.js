@@ -525,6 +525,10 @@ $$("[data-wizard]").forEach((form) => {
   if (params.get("orders") && range) { range.value = params.get("orders"); range.dispatchEvent(new Event("input")); }
   if (params.get("hub")) { const r = $(`input[name="Preferred warehouse"][value="${params.get("hub")}"]`, form); if (r) r.checked = true; }
   if (params.get("email")) { const e = $('input[name="Email"]', form); if (e) e.value = params.get("email"); }
+  if (params.get("channel")) {
+    const c = $$('input[name="Sales channels"]', form).find((x) => x.value === params.get("channel"));
+    if (c) c.checked = true;
+  }
 
   const render = () => {
     steps.forEach((s, idx) => { s.hidden = idx !== i; });

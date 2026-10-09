@@ -119,7 +119,31 @@ PAGES = [
      "Terms & Conditions | Boxio",
      "Terms and conditions governing use of the boxioship.com website.",
      "Terms & Conditions"),
+    ("/shopify-fulfillment/", "shopify.html",
+     "Shopify Fulfillment | Utah & Florida 3PL | Boxio",
+     "Shopify fulfillment from Utah and Florida. Orders sync automatically, ship fast with 99.99% accuracy, and tracking flows back to Shopify. Get a free quote.",
+     "Shopify Fulfillment"),
+    ("/amazon-fulfillment/", "amazon.html",
+     "Amazon FBA Prep & FBM Fulfillment | Boxio 3PL",
+     "Amazon FBA prep and merchant-fulfilled (FBM) shipping from Utah and Florida. Labeling, bundling, FBA replenishment and fast order fulfillment. Free quote.",
+     "Amazon Fulfillment"),
+    ("/walmart-fulfillment/", "walmart.html",
+     "Walmart Marketplace Fulfillment | Boxio 3PL",
+     "Walmart Marketplace fulfillment from Utah and Florida. Orders sync automatically and ship on time to protect your seller metrics. D2C and B2B. Free quote.",
+     "Walmart Fulfillment"),
+    ("/tiktok-shop-fulfillment/", "tiktok.html",
+     "TikTok Shop Fulfillment | Utah & Florida 3PL | Boxio",
+     "TikTok Shop fulfillment built for viral spikes. Orders sync automatically and ship fast from Utah and Florida, including creator samples. Get a free quote.",
+     "TikTok Shop Fulfillment"),
 ]
+
+# Sales-channel pages: path -> (channel name used in the quote form, schema service name)
+CHANNEL_PAGES = {
+    "/shopify-fulfillment/": ("Shopify", "Shopify order fulfillment"),
+    "/amazon-fulfillment/": ("Amazon", "Amazon FBA prep and FBM fulfillment"),
+    "/walmart-fulfillment/": ("Walmart", "Walmart Marketplace fulfillment"),
+    "/tiktok-shop-fulfillment/": ("TikTok Shop", "TikTok Shop fulfillment"),
+}
 
 # Old URLs on the current site -> new URLs (301). Written to _redirects and .htaccess.
 REDIRECTS = {
@@ -156,6 +180,46 @@ FAQS = {
          "Yes. We work with brands across Utah County, Salt Lake County and the rest of the state, along with brands nationwide. Local brands can talk with our team in person."),
         ("What services are available at the Utah warehouse?",
          "Order fulfillment (pick, pack and ship), inventory storage, real-time inventory management, kitting and bundling, B2B and retail distribution, retail dropshipping, and 2-day express and international shipping."),
+    ],
+    "shopify": [
+        ("How does Shopify fulfillment with Boxio work?",
+         "Connect your Shopify store and orders flow to our warehouse automatically. We pick, pack and ship each order, then push tracking back to Shopify so your customer gets their shipping notification right away."),
+        ("Does Boxio sync inventory with Shopify?",
+         "Yes. Inventory counts update in real time as stock is received and orders ship, so your Shopify store always shows what's actually available and you avoid overselling."),
+        ("Can you ship Shopify wholesale and B2B orders too?",
+         "Yes. We ship D2C and B2B orders from the same inventory, so wholesale and retail orders go out alongside your everyday Shopify orders."),
+        ("Which warehouse should my Shopify orders ship from?",
+         "Our Utah warehouse is fastest for the West and Mountain states, and Jacksonville, Florida is fastest for the Southeast and East Coast. Many brands use both so every order ships from the closer warehouse."),
+    ],
+    "amazon": [
+        ("Do you offer Amazon FBA prep?",
+         "Yes. We receive your inventory, apply FNSKU labels, poly-bag or bundle units as required, label cartons and ship them into Amazon fulfillment centers."),
+        ("Can you fulfill merchant-fulfilled (FBM) Amazon orders?",
+         "Yes. FBM orders sync from Seller Central automatically and ship on time with valid tracking, which protects your seller metrics."),
+        ("Can I use one inventory for Amazon and my own website?",
+         "Yes. Keep your inventory with us, replenish FBA as needed and ship your Shopify, TikTok Shop and FBM orders from the same stock."),
+        ("Why keep inventory at a 3PL instead of all in FBA?",
+         "Amazon limits how much inventory you can store and charges more for long-term storage. Keeping your main inventory with us and sending FBA what it needs avoids stockouts and storage limits."),
+    ],
+    "walmart": [
+        ("Do you integrate with Walmart Marketplace?",
+         "Yes. Walmart Marketplace orders flow to our warehouse automatically, and tracking is sent back to Walmart as soon as each order ships."),
+        ("How do you help protect my Walmart seller performance?",
+         "Walmart holds sellers to strict on-time shipping and tracking standards. With 99.97% on-time shipments and automatic tracking uploads, your orders go out on time with valid tracking."),
+        ("Can you handle B2B and retail orders as well?",
+         "Yes. We ship D2C and B2B orders from the same inventory. Tell us your retail and wholesale requirements and we'll set up the right packing and shipping workflow."),
+        ("Can I sell on Walmart, Amazon and Shopify from one inventory?",
+         "Yes. All of your channels pull from one inventory pool in our warehouses, so stock levels stay accurate everywhere you sell."),
+    ],
+    "tiktok": [
+        ("Does Boxio integrate with TikTok Shop?",
+         "Yes. TikTok Shop orders sync to our warehouse automatically, and tracking flows back to TikTok Shop as soon as each order ships."),
+        ("Can you handle a viral spike in TikTok Shop orders?",
+         "Yes. Our team and infrastructure scale with demand. Let us know before a big LIVE, launch or creator push and we'll plan staffing and inventory so orders keep shipping on time."),
+        ("Can you ship creator and affiliate samples?",
+         "Yes. Creator and affiliate sample orders ship just like customer orders, so you can get product into creators' hands quickly."),
+        ("How do TikTok Shop orders get to customers faster?",
+         "Ship from the warehouse closest to each customer: Springville, Utah for the West and Jacksonville, Florida for the Southeast and East Coast."),
     ],
     "florida": [
         ("Where is Boxio's Florida fulfillment center?",
@@ -389,6 +453,12 @@ def schema_for(path, label, body_src):
         graph.append(local_business("ut"))
     if path == "/florida-fulfillment-center/":
         graph.append(local_business("fl"))
+    if path in CHANNEL_PAGES:
+        name = CHANNEL_PAGES[path][1]
+        graph.append({"@type": "Service", "name": name, "serviceType": name,
+                      "provider": {"@id": CONFIG["site_url"] + "/#organization"},
+                      "areaServed": {"@type": "Country", "name": "United States"},
+                      "url": CONFIG["site_url"] + path})
     if path == "/services/":
         names = ["Ecommerce order fulfillment", "Warehousing & inventory storage", "Inventory management", "Kitting & bundling",
                  "B2B & retail distribution", "Retail dropshipping", "2-day & international shipping"]
@@ -410,7 +480,16 @@ def header(path):
   <div class="container header-inner">
     <a class="logo" href="/" aria-label="Boxio home">{LOGO}</a>
     <nav class="nav" aria-label="Main">
-      <a href="/services/"{cur('/services/')}>Services</a>
+      <div class="dd">
+        <button type="button" aria-expanded="false" aria-haspopup="true">Services <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+        <div class="dd-menu">
+          <a href="/services/"><span class="pin">3PL</span><span><strong>All fulfillment services</strong><span>Pick &amp; pack, storage, kitting, B2B</span></span></a>
+          <a href="/shopify-fulfillment/"><span class="pin">SH</span><span><strong>Shopify fulfillment</strong><span>Orders &amp; tracking sync automatically</span></span></a>
+          <a href="/amazon-fulfillment/"><span class="pin">AMZ</span><span><strong>Amazon FBA prep &amp; FBM</strong><span>Prep, replenishment &amp; order fulfillment</span></span></a>
+          <a href="/walmart-fulfillment/"><span class="pin">WMT</span><span><strong>Walmart fulfillment</strong><span>On-time shipping for Marketplace sellers</span></span></a>
+          <a href="/tiktok-shop-fulfillment/"><span class="pin">TT</span><span><strong>TikTok Shop fulfillment</strong><span>Built for viral spikes &amp; creator samples</span></span></a>
+        </div>
+      </div>
       <div class="dd">
         <button type="button" aria-expanded="false" aria-haspopup="true">Locations <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
         <div class="dd-menu">
@@ -469,6 +548,10 @@ def footer():
         <h4>Company</h4>
         <ul>
           <li><a href="/services/">3PL fulfillment services</a></li>
+          <li><a href="/shopify-fulfillment/">Shopify fulfillment</a></li>
+          <li><a href="/amazon-fulfillment/">Amazon FBA prep &amp; FBM</a></li>
+          <li><a href="/walmart-fulfillment/">Walmart fulfillment</a></li>
+          <li><a href="/tiktok-shop-fulfillment/">TikTok Shop fulfillment</a></li>
           <li><a href="/integrations/">Integrations</a></li>
           <li><a href="/about/">About Boxio</a></li>
           <li><a href="/request-a-quote/">Get a free 3PL quote</a></li>
