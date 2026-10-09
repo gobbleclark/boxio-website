@@ -81,35 +81,35 @@ CONFIG = {
 PAGES = [
     ("/", "home.html",
      "Ecommerce Fulfillment & 3PL in Utah and Florida | Boxio",
-     "Boxio is a tech-enabled 3PL with fulfillment centers in Springville, Utah and Florida. Fast pick, pack & ship, real-time inventory and 99.99% order accuracy. Get a free quote.",
+     "Tech-enabled 3PL with fulfillment centers in Springville, UT and Jacksonville, FL. Fast pick, pack & ship with 99.99% accuracy. Get a free quote.",
      None),
     ("/utah-fulfillment-center/", "utah.html",
      "Utah Fulfillment Center & 3PL in Springville, UT | Boxio",
-     "Ecommerce fulfillment in Utah from Boxio's Springville warehouse off I-15. Pick, pack & ship, storage, kitting and B2B for brands across Utah and the West. Free quote.",
+     "Ecommerce fulfillment from Boxio's Springville, Utah warehouse off I-15. Pick, pack & ship, storage, kitting and B2B for brands across the West.",
      "Utah Fulfillment Center"),
     ("/florida-fulfillment-center/", "florida.html",
-     "Florida Fulfillment Center & 3PL in Jacksonville, FL | Boxio",
-     "Ecommerce fulfillment in Florida from Boxio's Jacksonville warehouse. Reach Southeast and East Coast customers faster with pick, pack & ship, storage, kitting and B2B. Free quote.",
+     "Florida 3PL & Fulfillment Center in Jacksonville | Boxio",
+     "Ecommerce fulfillment from Boxio's Jacksonville, Florida warehouse. Reach Southeast and East Coast customers faster with pick, pack & ship and B2B.",
      "Florida Fulfillment Center"),
     ("/services/", "services.html",
-     "3PL Fulfillment Services | Pick, Pack, Ship & Storage | Boxio",
-     "Full-service ecommerce 3PL: order fulfillment, warehousing, inventory management, kitting & bundling, B2B retail distribution, dropshipping and 2-day shipping from Utah and Florida.",
+     "3PL Fulfillment Services | Pick, Pack & Ship | Boxio",
+     "Full-service ecommerce 3PL: order fulfillment, warehousing, inventory, kitting, B2B distribution and 2-day shipping from Utah and Florida.",
      "Services"),
     ("/integrations/", "integrations.html",
-     "65+ Fulfillment Integrations: Shopify, Amazon, Walmart, TikTok Shop | Boxio",
-     "Connect Shopify, WooCommerce, BigCommerce, Amazon, Walmart, TikTok Shop, NetSuite, Loop and 60+ more to Boxio fulfillment. Ship with UPS, FedEx, USPS, DHL and more.",
+     "65+ Fulfillment Integrations: Shopify, Amazon & More | Boxio",
+     "Connect Shopify, Amazon, Walmart, TikTok Shop, NetSuite, Loop and 60+ more to Boxio fulfillment. Ship with UPS, FedEx, USPS and DHL.",
      "Integrations"),
     ("/about/", "about.html",
      "About Boxio | Tech-Enabled 3PL in Utah & Florida",
-     "Boxio is a tech-enabled third-party logistics company helping growing ecommerce brands ship faster from Utah and Florida with 99.99% order accuracy.",
+     "Boxio is a tech-enabled 3PL helping growing ecommerce brands ship faster from Utah and Florida, with 99.99% order accuracy and 6M+ items a year.",
      "About"),
     ("/request-a-quote/", "quote.html",
      "Get a Free 3PL Fulfillment Quote | Boxio",
-     "Tell us about your orders and get a free, custom ecommerce fulfillment quote from Boxio's Utah and Florida warehouses. Reply within one business day.",
+     "Get a free, custom ecommerce fulfillment quote for Boxio's Utah and Florida warehouses. Takes about a minute; we reply within one business day.",
      "Free Quote"),
     ("/contact/", "contact.html",
      "Contact Boxio 3PL | Utah & Florida Fulfillment Centers",
-     "Contact Boxio fulfillment. Call, email or send a message to our Springville, Utah or Florida warehouse team.",
+     "Contact Boxio's 3PL team in Springville, Utah or Jacksonville, Florida. Call, email or send a message and we'll get back to you fast.",
      "Contact"),
     ("/privacy/", "privacy.html",
      "Privacy Policy | Boxio",
@@ -347,6 +347,9 @@ def albers_usa(lon, lat):
     return [round(tx + k * (px - cx), 1), round(ty - k * (py - cy), 1)]
 
 
+import hashlib
+ASSET_VERSION = {name: hashlib.sha1((SRC / "assets" / name).read_bytes()).hexdigest()[:10] for name in ("styles.css", "main.js")}
+
 def loc_tokens():
     t = {}
     for key, L in CONFIG["locations"].items():
@@ -535,7 +538,7 @@ def schema_for(path, label, body_src):
                       "datePublished": ARTICLE_DATE, "dateModified": ARTICLE_DATE,
                       "author": {"@id": CONFIG["site_url"] + "/#organization"},
                       "publisher": {"@id": CONFIG["site_url"] + "/#organization"},
-                      "image": CONFIG["site_url"] + "/assets/brand/logo-large.png",
+                      "image": CONFIG["site_url"] + "/assets/og/" + path.strip("/") + ".jpg",
                       "mainEntityOfPage": CONFIG["site_url"] + path})
     if path == "/b2b-fulfillment/":
         graph.append({"@type": "Service", "name": "B2B and wholesale fulfillment", "serviceType": "B2B fulfillment",
@@ -683,6 +686,9 @@ def render(path, src_name, title, desc, crumb):
         geo = '<meta name="geo.region" content="US-UT">\n<meta name="geo.placename" content="Springville, Utah">\n'
     if path == "/florida-fulfillment-center/":
         geo = '<meta name="geo.region" content="US-FL">\n<meta name="geo.placename" content="{{fl_city}}, Florida">\n'
+    og_slug = path.strip("/") or "home"
+    og_file = og_slug if (SRC / "assets" / "og" / f"{og_slug}.jpg").exists() else "home"
+    og_image = f"{CONFIG['site_url']}/assets/og/{og_file}.jpg"
     gsv = CONFIG["google_site_verification"].strip()
     gsv = f'\n<meta name="google-site-verification" content="{escape(gsv)}">' if gsv and path == "/" else ""
     html = f"""<!doctype html>
@@ -700,15 +706,17 @@ def render(path, src_name, title, desc, crumb):
 <meta property="og:description" content="{escape(fill(desc))}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#29254f">{gsv}
 <link rel="icon" href="/assets/brand/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/brand/icon.png">
-<meta property="og:image" content="{CONFIG['site_url']}/assets/brand/logo-large.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="/assets/styles.css">
+<meta property="og:image" content="{og_image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="{og_image}">
+<link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/styles.css?v={ASSET_VERSION['styles.css']}">
 <script type="application/ld+json">
 {schema}
 </script>
@@ -719,7 +727,9 @@ def render(path, src_name, title, desc, crumb):
 {body}
 </main>
 {footer()}
-<script src="/assets/main.js" defer></script>
+<script>window.va = window.va || function () {{ (window.vaq = window.vaq || []).push(arguments); }};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="/assets/main.js?v={ASSET_VERSION['main.js']}" defer></script>
 </body>
 </html>
 """

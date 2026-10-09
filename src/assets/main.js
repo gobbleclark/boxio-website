@@ -13,6 +13,17 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* ---------- Analytics (Vercel Web Analytics custom events) ---------- */
+const track = (name, data) => { try { window.va && window.va("event", { name, data }); } catch (e) { /* analytics must never break the page */ } };
+document.addEventListener("click", (e) => {
+  const tel = e.target.closest && e.target.closest('a[href^="tel:"]');
+  if (tel) track("Phone Click", { page: location.pathname });
+});
+// Calendly posts a message to the page when a call is booked
+window.addEventListener("message", (e) => {
+  if (e.origin === "https://calendly.com" && e.data && e.data.event === "calendly.event_scheduled") track("Call Booked", { page: location.pathname });
+});
+
 /* ---------- Header: scrolled state, mobile menu, dropdowns ---------- */
 const header = $(".site-header");
 const fab = $(".fab");
@@ -570,6 +581,7 @@ $$("[data-wizard]").forEach((form) => {
     submit.textContent = "Sending…";
     try {
       await deliver("quote", data);
+      track("Quote Submitted", { channel: data["Sales channels"] || "none", warehouse: data["Preferred warehouse"] || "none", volume: data["Monthly orders"] || "" });
       const rows = ["Monthly orders", "Preferred warehouse", "Sales channels", "Services"].filter((k) => data[k]).map((k) => `<div><dt>${k}</dt><dd>${escapeHtml(data[k])}</dd></div>`).join("");
       form.innerHTML = `<div class="success" role="status" tabindex="-1">
         <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -620,6 +632,7 @@ $$("[data-simple-form]").forEach((form) => {
     const data = collect(form);
     try {
       await deliver(form.dataset.formType || "contact", data);
+      track("Contact Submitted", { topic: data["Topic"] || "none" });
       form.innerHTML = `<div class="success" role="status" tabindex="-1">
         <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
         <h2>Message sent</h2><p class="lede" style="margin:0 auto">Thanks for reaching out. We'll get back to you within one business day.</p></div>`;
